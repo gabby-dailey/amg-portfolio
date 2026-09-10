@@ -36,6 +36,7 @@
   --mono:  'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --gut: clamp(20px, 4.5vw, 76px);
+  --screen-h: 62vh;      /* height budget for the stage screen */
   --ease: cubic-bezier(.22,1,.36,1);
   --ease-io: cubic-bezier(.65,.05,.36,1);
 }
@@ -304,11 +305,16 @@ section{position:relative}
 /* screen */
 .screen-col{display:flex;flex-direction:column;gap:clamp(14px,2vh,22px);min-width:0;justify-content:center}
 .screen{
-  position:relative;width:100%;aspect-ratio:16/9;max-height:62vh;
-  margin-inline:auto;background:#000;overflow:hidden;
+  /* Height budget is applied as a max-WIDTH so the box stays exactly 16:9.
+     Capping max-height instead left the box wider than ratio, which made the
+     player letterbox itself inside the frame. */
+  position:relative;width:min(100%, calc(var(--screen-h) * 16 / 9));
+  aspect-ratio:16/9;
+  margin-inline:auto;background:#000;overflow:hidden;cursor:pointer;
   border:1px solid var(--hair);
   box-shadow:0 40px 90px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.5);
 }
+body.cur-live .screen{cursor:none}
 .screen::before{
   content:'';position:absolute;inset:-14% -8%;z-index:-1;
   background:radial-gradient(closest-side, rgba(88,50,209,.5), transparent 72%);
@@ -320,7 +326,7 @@ section{position:relative}
 }
 .pane{position:absolute;inset:0;opacity:0;transition:opacity .85s var(--ease);z-index:1}
 .pane.on{opacity:1;z-index:2}
-.pane iframe{position:absolute;top:-12%;left:-4%;width:108%;height:124%;border:0;display:block;pointer-events:none}
+.pane iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:none}
 .pane .ph{
   position:absolute;inset:0;background:#0d0c12 center/cover no-repeat;
 }
@@ -332,6 +338,28 @@ section{position:relative}
 .rec{position:absolute;top:14px;right:34px;z-index:5;display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--bone-dim)}
 .rec i{width:5px;height:5px;border-radius:50%;background:var(--coral);animation:blink 1.7s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+/* sound toggle. Sits above the vignette so it stays legible on any frame. */
+.sound{
+  position:absolute;bottom:14px;right:14px;z-index:5;
+  display:flex;align-items:center;gap:9px;
+  padding:9px 15px;border:1px solid var(--hair);border-radius:999px;
+  background:rgba(11,10,16,.55);backdrop-filter:blur(8px);
+  font-family:var(--mono);font-size:9.5px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--bone-dim);
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),opacity .5s var(--ease);
+}
+.screen:hover .sound{color:var(--bone);border-color:var(--bone-faint)}
+.sound:hover{background:var(--violet);border-color:var(--violet);color:#fff}
+.sound .eq{display:flex;align-items:flex-end;gap:2px;height:10px;width:14px}
+.sound .eq i{flex:1;background:currentColor;height:22%;transition:height .3s var(--ease)}
+/* bars only dance while audio is actually on */
+.sound[aria-pressed="true"] .eq i{animation:eq .9s ease-in-out infinite;height:100%}
+.sound[aria-pressed="true"] .eq i:nth-child(1){animation-delay:0s}
+.sound[aria-pressed="true"] .eq i:nth-child(2){animation-delay:.15s}
+.sound[aria-pressed="true"] .eq i:nth-child(3){animation-delay:.3s}
+.sound[aria-pressed="true"] .eq i:nth-child(4){animation-delay:.45s}
+.sound[aria-pressed="true"]{color:var(--bone);border-color:var(--bone-faint)}
 
 /* metric strip */
 .strip{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;border-top:1px solid var(--hair-2);padding-top:clamp(11px,1.7vh,17px)}
@@ -521,7 +549,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   .idx-i{grid-template-columns:1fr;border-top:0;border-bottom:1px solid var(--hair-2);padding:10px 16px 10px 0;white-space:nowrap;width:auto;flex:0 0 auto}
   .idx-i:last-child{border-bottom:1px solid var(--hair-2)}
   .idx-i .n{display:none}
-  .screen{max-height:none}
+  .screen{width:100%}          /* no height budget on small screens */
   .duel{grid-template-columns:1fr;gap:14px}
   .vs{writing-mode:horizontal-tb;text-align:center}
   .side.them .fig{font-size:clamp(30px,9vw,52px)}
@@ -634,6 +662,10 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
           <span class="corner tl"></span><span class="corner tr"></span>
           <span class="corner bl"></span><span class="corner br"></span>
           <span class="rec"><i></i>LIVE</span>
+          <button class="sound" id="sound" aria-pressed="false">
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="txt">Unmute</span>
+          </button>
         </div>
         <div class="strip">
           <div class="metric" id="metric" aria-live="polite"></div>
@@ -873,7 +905,7 @@ function ytSrc(id, opts){
     mute: o.mute === false ? '0' : '1',
     controls: o.controls ? '1' : '0',
     modestbranding:'1', rel:'0', playsinline:'1', fs: o.controls ? '1' : '0',
-    iv_load_policy:'3', disablekb: o.controls ? '0' : '1',
+    iv_load_policy:'3', cc_load_policy:'0', cc_lang_pref:'en', disablekb: o.controls ? '0' : '1',
     enablejsapi:'1'
   });
   if (ORIGIN) p.set('origin', ORIGIN);
@@ -944,6 +976,18 @@ function cmd(frame, func, args){
   }catch(e){}
 }
 
+/* cc_load_policy=0 only stops YouTube forcing captions on. A viewer whose
+   account defaults to captions still gets them, so tear the module out. */
+function killCaptions(f){
+  cmd(f, 'unloadModule', ['captions']);   // html5 player
+  cmd(f, 'unloadModule', ['cc']);         // legacy name
+  cmd(f, 'setOption', ['captions', 'track', {}]);
+}
+
+/* Stage sound is sticky: turn it on once and every following chapter keeps it. */
+let SOUND = false;
+let stageSync = null;   // stage() registers its re-apply function here
+
 function dropFrame(f){
   if (!f) return;
   const i = FRAMES.indexOf(f);
@@ -956,7 +1000,11 @@ window.addEventListener('message', (e)=>{
   let d;
   try { d = JSON.parse(e.data); } catch(err){ return; }
   const src = FRAMES.find(x => x.contentWindow === e.source);
-  if (src) src.dataset.ready = '1';          // the player is alive and talking
+  if (src && src.dataset.ready !== '1'){
+    src.dataset.ready = '1';                 // the player is alive and talking
+    killCaptions(src);
+    if (stageSync) stageSync();              // a new chapter inherits the sound
+  }
 
   const st = d && d.info && d.info.playerState;
   if (st !== 0 && st !== 2) return;           // 0 = ended, 2 = paused
@@ -1145,9 +1193,11 @@ function cursor(){
     requestAnimationFrame(loop);
   })();
   document.addEventListener('mouseover', e=>{
-    const t = e.target.closest('.tile');
-    if (t){ c.textContent = 'PLAY'; c.classList.add('on'); }
-    else c.classList.remove('on');
+    if (e.target.closest('.tile')){
+      c.textContent = 'PLAY'; c.classList.add('on');
+    } else if (e.target.closest('.screen')){
+      c.textContent = SOUND ? 'MUTE' : 'SOUND'; c.classList.add('on');
+    } else c.classList.remove('on');
   });
   document.addEventListener('mouseleave', ()=> c.classList.remove('on'));
 }
@@ -1240,6 +1290,30 @@ function stage(){
     });
   }
 
+  const btn = document.getElementById('sound');
+
+  /* Applies the sticky sound state to whichever chapter is on screen, and
+     keeps every other player silent so two never overlap. */
+  function sync(){
+    panes.forEach((p,k)=>{
+      if (!p.frame) return;
+      if (k === active && SOUND){
+        cmd(p.frame,'unMute');
+        cmd(p.frame,'setVolume',[100]);
+        killCaptions(p.frame);              // unmuting can pull captions back in
+      } else {
+        cmd(p.frame,'mute');
+      }
+    });
+    btn.setAttribute('aria-pressed', SOUND ? 'true' : 'false');
+    btn.querySelector('.txt').textContent = SOUND ? 'Sound on' : 'Unmute';
+  }
+  stageSync = sync;
+
+  function toggle(){ SOUND = !SOUND; sync(); }
+  btn.addEventListener('click', e=>{ e.stopPropagation(); toggle(); });
+  screen.addEventListener('click', toggle);   // the whole frame is the target
+
   function go(i){
     if (i === active || i < 0 || i >= CHAPTERS.length) return;
     const prev = active;
@@ -1257,6 +1331,7 @@ function stage(){
       b.setAttribute('aria-selected', k===i ? 'true' : 'false');
     });
 
+    sync();                       // incoming chapter inherits the sound state
     cNow.textContent = String(i+1).padStart(2,'0');
     disc.textContent = c.disc;
     setMetric(c.metric);
@@ -1330,7 +1405,7 @@ function wall(){
 
     t.addEventListener('mouseenter', ()=>{
       grid.classList.add('hovering');
-      if (rec.frame) cmd(rec.frame,'unMute');
+      if (rec.frame){ cmd(rec.frame,'unMute'); killCaptions(rec.frame); }
     });
     t.addEventListener('mouseleave', ()=>{
       grid.classList.remove('hovering');
