@@ -427,25 +427,9 @@ body.cur-live .screen{cursor:none}
 .playmark::after{content:'';border-left:9px solid var(--bone);border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:3px}
 .noembed .playmark{display:grid}
 .tile:hover .playmark{background:var(--violet);border-color:var(--violet)}
-.tile .tint{position:absolute;inset:0;z-index:3;background:linear-gradient(to top,rgba(11,10,16,.92) 0%,rgba(11,10,16,.25) 46%,rgba(11,10,16,.1) 100%);transition:opacity .5s var(--ease)}
-.tile .meta{position:absolute;left:0;right:0;bottom:0;padding:clamp(11px,1.3vw,20px);z-index:4}
-.tile .cl{font-family:var(--sans);font-weight:600;font-size:clamp(11px,.92vw,14px);letter-spacing:.06em;text-transform:uppercase;line-height:1.2}
-.tile .mt{font-family:var(--mono);font-size:clamp(8.5px,.66vw,10px);letter-spacing:.16em;text-transform:uppercase;color:var(--violet-2);margin-top:5px;
-  opacity:0;transform:translateY(6px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.tile .idn{position:absolute;top:clamp(10px,1.2vw,16px);left:clamp(11px,1.3vw,20px);z-index:4;font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--bone-faint)}
-.tile .audio{position:absolute;top:clamp(10px,1.2vw,16px);right:clamp(11px,1.3vw,20px);z-index:4;display:flex;gap:2px;align-items:flex-end;height:11px;opacity:0;transition:opacity .4s}
-.tile .audio i{width:2px;background:var(--bone);display:block;animation:eq .9s ease-in-out infinite}
-.tile .audio i:nth-child(1){height:40%;animation-delay:0s}
-.tile .audio i:nth-child(2){height:100%;animation-delay:.15s}
-.tile .audio i:nth-child(3){height:65%;animation-delay:.3s}
-.tile .audio i:nth-child(4){height:85%;animation-delay:.45s}
 @keyframes eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
 body.cur-live .tile{cursor:none}
 .tile:hover{transform:scale(1.028);border-color:var(--hair);z-index:5}
-.tile:hover .tint{opacity:.45}
-.tile:hover .mt{opacity:1;transform:none}
-.tile:hover .audio{opacity:1}
-.wall-grid.hovering .tile:not(:hover){opacity:.34;filter:saturate(.35)}
 
 /* ============================================================
    05 THE MATH
@@ -475,7 +459,9 @@ body.cur-live .tile{cursor:none}
    06 CAPABILITIES
    ============================================================ */
 #caps{padding:clamp(70px,11vh,140px) var(--gut);border-top:1px solid var(--hair-2)}
-.caps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--hair-2);border:1px solid var(--hair-2);margin-top:clamp(34px,5vw,60px)}
+.caps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--hair-2);border:1px solid var(--hair-2);margin-top:clamp(34px,5vw,60px)}
+@media (max-width:900px){.caps-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.caps-grid{grid-template-columns:1fr}}
 .cap{background:var(--ink);padding:clamp(24px,3vw,42px);position:relative;overflow:hidden;transition:background .55s var(--ease)}
 .cap::before{content:'';position:absolute;top:0;left:0;width:100%;height:1px;background:var(--violet);transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease)}
 .cap:hover{background:var(--ink-2)}
@@ -703,7 +689,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   <div class="in-w">
     <span class="label label--v rv" style="display:block;margin-bottom:clamp(22px,3vw,38px)">Our position</span>
     <blockquote class="rv" data-d="90">
-      We believe in <em>AI produced ads</em>. Full stop.
+      We believe in <em>AI produced ads</em>.<br>Full stop.
     </blockquote>
     <div class="after">
       <p class="rv" data-d="220">
@@ -724,12 +710,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   <div class="wrap sec-head">
     <div>
       <span class="label label--v rv" style="display:block;margin-bottom:16px">The Reel Wall</span>
-      <h2 class="display d-lg rv" data-d="90">Volume, without<br>the waste.</h2>
+      <h2 class="display d-lg rv" data-d="90">Volume, without the waste.</h2>
     </div>
-    <p class="lede rv" data-d="200" style="max-width:38ch">
-      Eight to fifteen variants per concept, structured as a real experiment.
-      Hover any frame to listen in. Click to take the room.
-    </p>
   </div>
   <div class="wall-grid" id="wallGrid"></div>
 </section>
@@ -1198,6 +1180,8 @@ function splitWords(){
           if (!t.trim()) { out.push(t); return; }
           out.push('<span class="w"><i>'+t+'</i></span>');
         });
+      } else if (n.nodeName === 'BR'){
+        out.push('<br>');                       // must stay a real line break
       } else {
         out.push('<span class="w"><i>'+n.outerHTML+'</i></span>');
       }
@@ -1460,37 +1444,30 @@ function stage(){
 function wall(){
   const grid = document.getElementById('wallGrid');
   const tiles = [];
-  /* Was 4, which meant most tiles only began loading once they were nearly
-     centred, so they were still spinning up as they came into view. Desktop
-     now carries the whole wall; touch devices stay conservative. */
-  const BUDGET = COARSE ? 3 : REELS.length;
+  /* Every film runs, on every device. Nine simultaneous players is a real
+     cost on a phone, so if the wall ever feels heavy on mobile this is the
+     single number to turn down. */
+  const BUDGET = REELS.length;
 
   REELS.forEach((r,i)=>{
     const t = document.createElement('button');
     t.className = 'tile' + (r.vert ? ' vert' : '');
     t.style.gridColumn = 'span ' + (r.span || 2);
     if (r.rows) t.style.gridRow = 'span ' + r.rows;
+    // No captions, index numbers, scrim or equalizer: the films carry the wall
+    // on their own. Client and metric still travel with the data and appear in
+    // the cinema overlay on click.
     t.innerHTML =
       '<div class="fallback"></div>' +
-      '<span class="playmark"></span>' +
-      '<div class="tint"></div>' +
-      '<span class="idn">'+String(i+1).padStart(2,'0')+'</span>' +
-      '<span class="audio"><i></i><i></i><i></i><i></i></span>' +
-      '<div class="meta"><div class="cl">'+r.client+'</div><div class="mt">'+r.metric+'</div></div>';
+      '<span class="playmark"></span>';
     t.setAttribute('aria-label','Play '+r.client+' reel');
     t.querySelector('.fallback').appendChild(poster(r.id));
     grid.appendChild(t);
     const rec = {el:t, r:r, frame:null, visible:false, live:false};
     tiles.push(rec);
 
-    t.addEventListener('mouseenter', ()=>{
-      grid.classList.add('hovering');
-      if (rec.frame){ cmd(rec.frame,'unMute'); killCaptions(rec.frame); }
-    });
-    t.addEventListener('mouseleave', ()=>{
-      grid.classList.remove('hovering');
-      if (rec.frame) cmd(rec.frame,'mute');
-    });
+    // Every tile stays muted and looping; sound only ever happens in the
+    // cinema overlay, so nothing changes under the cursor.
     t.addEventListener('click', ()=> openCinema(r));
   });
 
@@ -1514,8 +1491,9 @@ function wall(){
     const seen = [];
     tiles.forEach(rec=>{
       const r = rec.el.getBoundingClientRect();
-      // start a whole screen early so a tile is already running when it arrives
-      rec.visible = r.bottom > -vh && r.top < vh * 2 && r.height > 0;
+      // A generous window either side, so tiles are already running before they
+      // arrive and are not torn down the moment they leave.
+      rec.visible = r.bottom > -vh * 2 && r.top < vh * 3 && r.height > 0;
       if (rec.visible) seen.push({rec:rec, d:Math.abs((r.top + r.height/2) - mid)});
     });
     seen.sort((a,b)=> a.d - b.d);
