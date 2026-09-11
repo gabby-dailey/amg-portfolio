@@ -438,6 +438,10 @@ body.cur-live .tile{cursor:none}
    05 THE MATH
    ============================================================ */
 #math{padding:clamp(70px,11vh,140px) var(--gut);border-top:1px solid var(--hair-2);position:relative;overflow:hidden}
+/* Baseline alignment pinned this copy to the eyebrow, floating it above the
+   headline. Bottom aligning drops it level with the headline instead. */
+#math .sec-head{align-items:flex-end}
+#math .sec-head > p{padding-bottom:.3em}
 .duel{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(18px,3vw,54px);align-items:center;margin-top:clamp(34px,5vw,64px)}
 .side{padding:clamp(20px,2.6vw,38px);border:1px solid var(--hair-2);position:relative}
 .side .who{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-faint);margin-bottom:clamp(14px,1.8vw,22px)}
@@ -448,11 +452,11 @@ body.cur-live .tile{cursor:none}
 .side.us{border-color:rgba(88,50,209,.55);background:linear-gradient(160deg,rgba(88,50,209,.16),transparent 70%)}
 .side.us .fig{color:var(--bone)}
 .side.us .who{color:var(--violet-2)}
-.vs{font-family:var(--mono);font-size:10px;letter-spacing:.22em;color:var(--bone-faint);writing-mode:vertical-rl;text-orientation:mixed}
+.vs{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--bone-faint);text-align:center;text-transform:lowercase}
 .math-out{margin-top:clamp(30px,4.4vw,58px);display:flex;align-items:baseline;gap:clamp(14px,2vw,28px);flex-wrap:wrap;border-top:1px solid var(--hair-2);padding-top:clamp(20px,2.6vw,32px)}
 .math-out .big{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.6vw,72px);line-height:1;letter-spacing:-.03em}
 .math-out .big span{color:var(--burnt)}
-.math-out p{margin:0;max-width:34ch;font-size:14px;line-height:1.62;color:var(--bone-dim)}
+.math-out p{margin:0;max-width:none;font-size:14px;line-height:1.62;color:var(--bone-dim)}
 
 /* ============================================================
    06 CAPABILITIES
@@ -553,7 +557,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   .idx-note{display:block;max-width:none;min-height:0;margin-top:16px}
   .screen{width:100%}          /* no height budget on small screens */
   .duel{grid-template-columns:1fr;gap:14px}
-  .vs{writing-mode:horizontal-tb;text-align:center}
+  .vs{text-align:center}
   .side.them .fig{font-size:clamp(30px,9vw,52px)}
   .wall-grid{grid-template-columns:repeat(2,1fr)}
   .tile{grid-column:span 2!important;cursor:pointer}
@@ -720,7 +724,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   <div class="sec-head">
     <div>
       <span class="label label--v rv" style="display:block;margin-bottom:16px">The Math</span>
-      <h2 class="display d-lg rv" data-d="90">Same spot.<br>Different invoice.</h2>
+      <h2 class="display d-lg rv" data-d="90">Same visual.<br>Different invoice</h2>
     </div>
     <p class="lede rv" data-d="200" style="max-width:36ch">
       A recent luxury jewelry launch. 3D modeling, animation, effects, storyboards
@@ -734,11 +738,11 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
       <div class="fig">$85 to 125K</div>
       <div class="sub">Six figures of coordination<br>Weeks of calendar</div>
     </div>
-    <div class="vs rv" data-d="140">versus</div>
+    <div class="vs rv" data-d="140">vs</div>
     <div class="side us rv" data-d="240">
       <div class="who">Our production</div>
-      <div class="fig">$5,500</div>
-      <div class="sub">48 hour turnaround<br>Concept to final cut</div>
+      <div class="fig">$4,000</div>
+      <div class="sub">21 day turnaround<br>Concept to first cut</div>
     </div>
   </div>
 
@@ -839,7 +843,7 @@ const HERO_ID = 'LtjUXIZdAlU';   // AMG Sizzle Reel
 // CINEMA STAGE chapters (the flagships)
 const CHAPTERS = [
   { id:'sON-woKfynA', client:'Exotic Nutrition',  metric:'31x Blended ROAS',
-    disc:'YouTube Ads',
+    disc:'YouTube and Amazon Ads',
     note:'Hook engineered for the scroll. The first three seconds decide whether the rest of the spot gets watched at all.' },
 
   { id:'kOv-39EJ-yY', client:'TPG Creations',     metric:'Custom Musical Production',
