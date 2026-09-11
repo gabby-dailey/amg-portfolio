@@ -395,10 +395,12 @@ body.cur-live .screen{cursor:none}
   transition:transform .7s var(--ease),border-color .5s var(--ease),filter .55s var(--ease),opacity .55s var(--ease);
   transform-origin:center;
 }
-.tile.tall{aspect-ratio:4/5}
-.tile.sq{aspect-ratio:1/1}
-.tile iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:calc(100% + 2px);height:calc(100% * 1.42);border:0;pointer-events:none}
-.tile.tall iframe,.tile.sq iframe{height:calc(100% * 1.9);width:auto;min-width:calc(100% + 2px);aspect-ratio:16/9}
+.tile.vert{aspect-ratio:9/16}
+.tile iframe{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;border:0;pointer-events:none}
+/* A Short is a 9:16 film pillarboxed inside a 16:9 player, so the player has to
+   be scaled until the film itself fills the tile. The film occupies 81/256 of
+   the player width, hence the inverse here. Height then matches the tile exactly. */
+.tile.vert iframe{width:calc(100% * 256 / 81);height:100%}
 .tile .fallback{position:absolute;inset:0;background:linear-gradient(140deg,#1a1824,#0d0c12)}
 /* Real frames from each film, used as the poster under every embed. Doubles as
    the graceful fallback when YouTube will not serve an embed at all. */
@@ -543,6 +545,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   .stage-body{grid-template-columns:minmax(180px,220px) minmax(0,1fr);gap:24px}
   .idx-note{display:none}
   .wall-grid{grid-template-columns:repeat(4,1fr)}
+  .tile{grid-column:span 2!important}
+  .tile.vert{grid-column:span 1!important}
 }
 @media (max-width:820px){
   .stage{height:auto;min-height:0;position:relative;padding-bottom:34px}
@@ -561,7 +565,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   .side.them .fig{font-size:clamp(30px,9vw,52px)}
   .wall-grid{grid-template-columns:repeat(2,1fr)}
   .tile{grid-column:span 2!important;cursor:pointer}
-  .tile.tall,.tile.sq{aspect-ratio:16/9}
+  .tile.vert{grid-column:span 1!important}
   .hero-foot{flex-direction:column;align-items:flex-start;gap:22px}
   .hero-top{top:76px}
   .nav-r .pill:not(.pill--v){display:none}
@@ -575,7 +579,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 }
 @media (max-width:520px){
   .wall-grid{grid-template-columns:1fr}
-  .tile{grid-column:span 1!important}
+  .tile,.tile.vert{grid-column:span 1!important}
   .strip{gap:12px}
   .strip .disc{text-align:left}
 }
@@ -865,11 +869,18 @@ const CHAPTERS = [
 
 // REEL WALL tiles. Awaiting the full reel list; extend this array.
 const REELS = [
-  { id:'sON-woKfynA', client:'Exotic Nutrition',  metric:'31x Blended ROAS',            span:4, rows:2 },
-  { id:'kOv-39EJ-yY', client:'TPG Creations',     metric:'Custom Musical Production',   span:2 },
-  { id:'r_Bz0DalnoA', client:'Curaprox',          metric:'Custom Jingle & Animation',   span:2 },
-  { id:'c9yYdB3kpAE', client:'Augusta Lawncare',  metric:'Mixed Media Composite',       span:3 },
-  { id:'5uRDrYF9XiU', client:'MitoGrow',          metric:'Under a Penny Per View',      span:3 }
+  // Row 1: two wide
+  { id:'ojYZ5QwXGYg', client:'Feazel',       metric:'Commercial',        span:3 },
+  { id:'LY6ZS1X75QU', client:'Lynx Golf',    metric:'Commercial',        span:3 },
+  // Row 2: three across
+  { id:'oGArURKHhPg', client:'Curaprox',     metric:'Crave Your Color',  span:2 },
+  { id:'q-fCaFTnivg', client:'Happsy',       metric:'Commercial',        span:2 },
+  { id:'7BNYaBbBP9k', client:'Licorice.com', metric:'Commercial',        span:2 },
+  // Row 3: three verticals sit flush beside one wide
+  { id:'nRjw6cEEIy8', client:'MiaDonna',     metric:'FaceTime UGC',      span:1, vert:true },
+  { id:'_IywuMgLSaA', client:'Happsy',       metric:'Creator UGC',       span:1, vert:true },
+  { id:'wyiYl8AVxao', client:'Creator Content', metric:'Vertical UGC',   span:1, vert:true },
+  { id:'VxLJYwPN-Mk', client:'Licorice.com', metric:'Valentine’s Day',    span:3 }
 ];
 
 const CAPS = [
@@ -1409,7 +1420,7 @@ function wall(){
 
   REELS.forEach((r,i)=>{
     const t = document.createElement('button');
-    t.className = 'tile' + (r.tall ? ' tall' : '') + (r.sq ? ' sq' : '');
+    t.className = 'tile' + (r.vert ? ' vert' : '');
     t.style.gridColumn = 'span ' + (r.span || 2);
     if (r.rows) t.style.gridRow = 'span ' + r.rows;
     t.innerHTML =
