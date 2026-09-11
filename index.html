@@ -549,6 +549,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   .idx-i{grid-template-columns:1fr;border-top:0;border-bottom:1px solid var(--hair-2);padding:10px 16px 10px 0;white-space:nowrap;width:auto;flex:0 0 auto}
   .idx-i:last-child{border-bottom:1px solid var(--hair-2)}
   .idx-i .n{display:none}
+  /* room to show the note again once the layout stacks */
+  .idx-note{display:block;max-width:none;min-height:0;margin-top:16px}
   .screen{width:100%}          /* no height budget on small screens */
   .duel{grid-template-columns:1fr;gap:14px}
   .vs{writing-mode:horizontal-tb;text-align:center}
@@ -630,7 +632,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
         </h1>
         <p class="lede rv" data-d="220">
           Original film, music and design produced at machine speed with human taste.
-          Faster to make. Cheaper to run. Built to win in the auction, not in an awards deck.
+          Faster to make. Cheaper to run. Built to win in the auction.
         </p>
       </div>
       <div class="hero-cues rv" data-d="380">
@@ -837,24 +839,24 @@ const HERO_ID = 'LtjUXIZdAlU';   // AMG Sizzle Reel
 // CINEMA STAGE chapters (the flagships)
 const CHAPTERS = [
   { id:'sON-woKfynA', client:'Exotic Nutrition',  metric:'31x Blended ROAS',
-    disc:'Performance Video',
-    note:'Hook engineered for the scroll. The first three seconds carry the whole spot, so that is where the work goes.' },
+    disc:'YouTube Ads',
+    note:'Hook engineered for the scroll. The first three seconds decide whether the rest of the spot gets watched at all.' },
 
   { id:'kOv-39EJ-yY', client:'TPG Creations',     metric:'Custom Musical Production',
-    disc:'Music & Sound Design',
-    note:'An original score written to picture. No stock audio, no library cues, composed for this cut and no other.' },
+    disc:'Streaming Platforms',
+    note:'An original score written for this commercial. No stock audio, no library cues, composed for this client and no other.' },
 
   { id:'r_Bz0DalnoA', client:'Curaprox',          metric:'Custom Jingle & Animation',
-    disc:'Jingle & Animation',
-    note:'A jingle, and an animated world built around it. Sound and image designed together as one piece.' },
+    disc:'YouTube and Google Ads',
+    note:'An idea born out of child-like imagination. A vending machine that dispenses a custom-color combo toothbrush to promote Curaprox’s mission of promoting individuality.' },
 
   { id:'c9yYdB3kpAE', client:'Augusta Lawncare',  metric:'Mixed Media Composite',
-    disc:'Mixed Media',
-    note:'Live action, generative frames and 2D treatment composited into a single seamless spot.' },
+    disc:'Local TV Ads',
+    note:'A mixed-world composite born from reality. Using Google Earth, our team hunted for references of the local architecture, so that the community of West Chester knew that Augusta was truly their best local choice.' },
 
   { id:'5uRDrYF9XiU', client:'MitoGrow',          metric:'Under a Penny Per View',
-    disc:'Paid Social Video',
-    note:'Volume without waste. Enough variants to test properly, delivered at a cost per view under one cent.' }
+    disc:'Meta and YouTube Ads',
+    note:'A perplexing hook to win the viewer’s attention. Viewers were watching the entire video, YouTube recognized this and essentially subsidized the ad because we kept people on their platform. If your creative is compelling enough, the internet will distribute it practically for free (or less than a penny).' }
 ];
 
 // REEL WALL tiles. Awaiting the full reel list; extend this array.
@@ -1340,6 +1342,20 @@ function stage(){
     setTimeout(()=>{ note.textContent = c.note; note.classList.remove('swap'); }, prev < 0 ? 0 : 260);
   }
 
+  /* Notes now vary from a line or two to a full paragraph. The side column is
+     vertically centred, so letting it resize would bounce the index on every
+     chapter change. Measure the tallest note at the current width and hold
+     that much space open. */
+  function reserveNote(){
+    if (window.innerWidth <= 1080){ note.style.minHeight = ''; return; }
+    const keep = note.textContent;
+    note.style.minHeight = '0px';
+    let tallest = 0;
+    CHAPTERS.forEach(c=>{ note.textContent = c.note; tallest = Math.max(tallest, note.scrollHeight); });
+    note.textContent = keep;
+    note.style.minHeight = tallest + 'px';
+  }
+
   function jump(i){
     if (window.innerWidth <= 820){ go(i); return; }
     const top = track.offsetTop;
@@ -1364,8 +1380,10 @@ function stage(){
 
   layout();
   go(0);
+  reserveNote();
+  setTimeout(reserveNote, 400);          // after webfonts settle
   onTick(tick);
-  window.addEventListener('resize', ()=>{ layout(); tick(); });
+  window.addEventListener('resize', ()=>{ layout(); tick(); reserveNote(); });
 
   // pause the whole stage when it is nowhere near the viewport
   watch(track, on=>{
