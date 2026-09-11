@@ -965,10 +965,12 @@ function poster(id, eager){
 function mkFrame(id, opts){
   const o = opts || {};
   const f = document.createElement('iframe');
-  f.src = ytSrc(id, o);
-  f.title = o.title || 'AdVenture Media reel';
   f.allow = 'autoplay; encrypted-media; picture-in-picture';
   f.setAttribute('allowfullscreen','');
+  f.title = o.title || 'AdVenture Media reel';
+  f.dataset.lastInfo = '0';
+  f.dataset.state = '';
+  f.src = ytSrc(id, o);          // set last, once permissions are in place
   f.dataset.loop = o.controls ? '0' : '1';   // ambient frames loop, cinema does not
   f.dataset.pid  = String(++FRAME_SEQ);
   f.dataset.want = o.autoplay ? 'play' : 'pause';
@@ -1044,28 +1046,42 @@ window.addEventListener('message', (e)=>{
   const f = FRAMES.find(x => x.contentWindow === e.source);
   if (!f || f.dataset.loop !== '1') return;   // cinema player keeps its controls
 
-  /* Unmask only while genuinely playing (1). In every other state YouTube may
-     be drawing its title bar and play button, so the poster stays over it. */
-  const host = f.parentElement;
-  if (host) host.classList.toggle('playing', st === 1);
+  f.dataset.state = String(st);
+  f.dataset.lastInfo = String(Date.now());
 
-  if (st === 1) return;                       // playing, nothing to do
+  /* Unmask only while genuinely playing. Anything else and YouTube may be
+     drawing its title bar, avatar and centre play button. */
+  const host = f.parentElement;
+  if (host && st !== 1) host.classList.remove('playing');
 
   if (st === 0){                              // ended: straight back to the head
     cmd(f, 'seekTo', [0, true]);
     cmd(f, 'playVideo');
-    return;
   }
-  /* -1 unstarted, 2 paused, 5 cued. Any of these means an ambient video has
-     stalled, usually because the browser throttled an offscreen or
-     backgrounded frame. Nudge it, but never in a tight loop. */
-  if (st !== -1 && st !== 2 && st !== 5) return;
-  if (f.dataset.want !== 'play' || document.hidden) return;
-  const now = Date.now();
-  if (now - (Number(f.dataset.nudged) || 0) < 1500) return;
-  f.dataset.nudged = String(now);
-  cmd(f, 'playVideo');
 });
+
+/* A player that stalls goes silent rather than announcing it, so a pause event
+   can never be relied on to restore the mask. While a video really is playing
+   YouTube reports progress several times a second, so treat that stream as a
+   heartbeat: if it stops, assume the video is not playing, put the mask back
+   and keep asking it to resume. */
+function maskWatch(){
+  const now = Date.now();
+  for (let i = 0; i < FRAMES.length; i++){
+    const f = FRAMES[i];
+    if (f.dataset.loop !== '1' || !f.isConnected) continue;
+    const host = f.parentElement;
+    if (!host) continue;
+    const fresh   = now - (Number(f.dataset.lastInfo) || 0) < 2000;
+    const playing = f.dataset.state === '1' && fresh;
+    host.classList.toggle('playing', playing);
+    if (playing || f.dataset.want !== 'play' || document.hidden) continue;
+    if (now - (Number(f.dataset.kicked) || 0) < 1200) continue;
+    f.dataset.kicked = String(now);
+    cmd(f, 'playVideo');
+  }
+}
+// registered in boot(), once the tick scheduler exists
 
 // Resume ambient playback when the tab comes back to the foreground.
 document.addEventListener('visibilitychange', ()=>{
@@ -1444,7 +1460,10 @@ function stage(){
 function wall(){
   const grid = document.getElementById('wallGrid');
   const tiles = [];
-  const BUDGET = COARSE ? 2 : 4;
+  /* Was 4, which meant most tiles only began loading once they were nearly
+     centred, so they were still spinning up as they came into view. Desktop
+     now carries the whole wall; touch devices stay conservative. */
+  const BUDGET = COARSE ? 3 : REELS.length;
 
   REELS.forEach((r,i)=>{
     const t = document.createElement('button');
@@ -1495,7 +1514,8 @@ function wall(){
     const seen = [];
     tiles.forEach(rec=>{
       const r = rec.el.getBoundingClientRect();
-      rec.visible = r.bottom > 0 && r.top < vh && r.height > 0;
+      // start a whole screen early so a tile is already running when it arrives
+      rec.visible = r.bottom > -vh && r.top < vh * 2 && r.height > 0;
       if (rec.visible) seen.push({rec:rec, d:Math.abs((r.top + r.height/2) - mid)});
     });
     seen.sort((a,b)=> a.d - b.d);
@@ -1581,6 +1601,8 @@ function boot(){
   wall();
   revealer();
   document.getElementById('heroH1').classList.add('in');
+  onTick(maskWatch);
+  setInterval(maskWatch, 700);   // runs even when nothing is scrolling
   scan();                      // first pass immediately
   setTimeout(scan, 260);       // and once more after webfonts settle
 }
