@@ -131,20 +131,6 @@ em.it{font-style:italic;font-weight:400}
 @keyframes holdBar{to{width:100%}}
 #hold .pct{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--bone-faint)}
 
-/* file:// notice */
-#filewarn{
-  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:9600;
-  width:min(680px,calc(100vw - 32px));display:grid;
-  grid-template-columns:1fr auto;gap:6px 18px;align-items:start;
-  padding:16px 18px;background:var(--ink-3);border:1px solid var(--hair);
-  box-shadow:0 24px 60px -20px rgba(0,0,0,.9);
-}
-#filewarn b{grid-column:1;font-family:var(--sans);font-weight:600;font-size:13px;letter-spacing:.01em}
-#filewarn span{grid-column:1;font-size:12.5px;line-height:1.6;color:var(--bone-dim)}
-#filewarn code{font-family:var(--mono);font-size:11px;background:rgba(239,237,231,.1);padding:2px 5px;color:var(--bone)}
-#filewarn button{grid-column:2;grid-row:1/span 2;font-size:19px;line-height:1;color:var(--bone-faint);padding:0 4px}
-#filewarn button:hover{color:var(--bone)}
-
 /* ============================================================
    CHROME: nav + progress
    ============================================================ */
@@ -215,7 +201,7 @@ section{position:relative}
 }
 .hero-bg.ready .cover{opacity:.30}
 /* overscan: clips YouTube's title bar and control bar out of frame */
-.hero-bg .cover iframe{position:absolute;top:-13%;left:-5%;width:110%;height:126%;border:0;display:block;pointer-events:none;z-index:1}
+.hero-bg .cover video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .hero-veil{
   position:absolute;inset:0;z-index:1;
   background:
@@ -327,7 +313,6 @@ body.cur-live .screen{cursor:none}
 .pane{position:absolute;inset:0;opacity:0;transition:opacity .85s var(--ease);z-index:1}
 .pane.on{opacity:1;z-index:2}
 .pane video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;z-index:1}
-.cover .poster{z-index:0}        /* underneath the player, never over it */
 .corner{position:absolute;width:16px;height:16px;z-index:4;pointer-events:none;border-color:var(--bone-faint);border-style:solid;border-width:0}
 .corner.tl{top:9px;left:9px;border-top-width:1px;border-left-width:1px}
 .corner.tr{top:9px;right:9px;border-top-width:1px;border-right-width:1px}
@@ -397,24 +382,6 @@ body.cur-live .screen{cursor:none}
 /* Our own files in their native shape: the vertical films really are 9:16,
    so a vertical tile simply holds one. No scaling tricks needed. */
 .tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0d0c12;z-index:1;pointer-events:none}
-/* Real frames from each film, used as the poster under every embed. Doubles as
-   the graceful fallback when YouTube will not serve an embed at all. */
-.poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s var(--ease);z-index:2}
-.poster.shown{opacity:1}
-/* YouTube only draws its title bar, avatar and play button when a video is
-   paused, ended or not yet started. Rather than crop the frame to hide that
-   chrome, hold the poster over the player until it reports it is genuinely
-   playing, then dissolve to the video. Chrome never gets a chance to show. */
-.playing .poster{opacity:0;transition:opacity .55s var(--ease)}
-.playing .ph{opacity:0}
-.playmark{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;
-  width:clamp(44px,4.4vw,64px);height:clamp(44px,4.4vw,64px);border-radius:50%;
-  border:1px solid var(--bone-faint);display:none;place-items:center;
-  background:rgba(11,10,16,.42);backdrop-filter:blur(6px);
-  transition:background .4s var(--ease),border-color .4s var(--ease);
-}
-.playmark::after{content:'';border-left:9px solid var(--bone);border-top:6px solid transparent;border-bottom:6px solid transparent;margin-left:3px}
 @keyframes eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
 body.cur-live .tile{cursor:none}
 .tile:hover{transform:scale(1.028);border-color:var(--hair);z-index:5}
@@ -716,12 +683,12 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   <div class="duel">
     <div class="side them rv">
       <div class="who">Traditional production</div>
-      <div class="fig">$85 to 125K</div>
+      <div class="fig">$25K to $65K</div>
       <div class="sub">Six figures of coordination<br>Weeks of calendar</div>
     </div>
     <div class="vs rv" data-d="140">vs</div>
     <div class="side us rv" data-d="240">
-      <div class="who">Our production</div>
+      <div class="who">Our production starts at</div>
       <div class="fig">$4,000</div>
       <div class="sub">21 day turnaround<br>Concept to first cut</div>
     </div>
@@ -814,7 +781,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 
 // HERO banner film. Plays muted behind the headline. Separate from the
 // stage chapters so it can be swapped without touching Featured Work.
-const HERO_ID = 'LtjUXIZdAlU';   // AMG Sizzle Reel
+const HERO_FILE = 'media/hero/sizzle.mp4';   // AMG sizzle reel
 
 // CINEMA STAGE chapters (the flagships)
 const CHAPTERS = [
@@ -907,210 +874,20 @@ function play(v){
   if (pr && pr.catch) pr.catch(function(){});   // a refused autoplay must not throw
 }
 
-/* ---------- youtube helpers (hero banner only) ----------
-   Deliberately NOT using &loop=1&playlist=ID: that puts the player in playlist
-   mode, which draws prev/pause/next chrome over the video. We loop manually off
-   the ended state instead, so the frame stays clean.
------------------------------------------------------------------- */
-const FRAMES = [];   // every live iframe, for the message router
-let FRAME_SEQ = 0;   // YouTube's handshake wants a numeric player id
+/* ---------- shared player state ---------- */
+let SOUND     = false;   // stage sound is sticky once switched on
+let stageSync = null;    // stage() registers its re-apply function here
+let wallPulse = null;    // wall() registers its play/pause sweep here
+let heroVideo = null;    // the banner loop, restarted on tab refocus
 
-function ytSrc(id, opts){
-  const o = opts || {};
-  const p = new URLSearchParams({
-    autoplay: o.autoplay ? '1' : '0',
-    mute: o.mute === false ? '0' : '1',
-    controls: o.controls ? '1' : '0',
-    modestbranding:'1', rel:'0', playsinline:'1', fs: o.controls ? '1' : '0',
-    iv_load_policy:'3', cc_load_policy:'0', cc_lang_pref:'en', disablekb: o.controls ? '0' : '1',
-    enablejsapi:'1'
-  });
-  if (ORIGIN) p.set('origin', ORIGIN);
-  return 'https://www.youtube.com/embed/' + id + '?' + p.toString();
-}
-
-/* YouTube thumbnail ladder: maxres is absent on some uploads, sd and hq always
-   resolve. object-fit:cover crops the 4:3 letterboxing off the smaller sizes. */
-function poster(id, eager){
-  const im = document.createElement('img');
-  im.className = 'poster'; im.alt = ''; im.decoding = 'async';
-  // The hero and the stage are the first thing anyone sees, so those load up
-  // front. The wall stays lazy so a long reel list costs nothing until scrolled.
-  im.loading = eager ? 'eager' : 'lazy';
-  if (eager) im.fetchPriority = 'high';
-  const ladder = ['maxresdefault','sddefault','hqdefault'];
-  let step = 0;
-  const load = ()=>{ im.src = 'https://i.ytimg.com/vi/'+id+'/'+ladder[step]+'.jpg'; };
-  im.addEventListener('error', ()=>{ if (++step < ladder.length) load(); });
-  im.addEventListener('load', ()=>{
-    // YouTube answers a missing size with a 120x90 grey placeholder
-    if (im.naturalWidth <= 121 && ++step < ladder.length) return load();
-    im.classList.add('shown');
-  });
-  load();
-  return im;
-}
-
-function mkFrame(id, opts){
-  const o = opts || {};
-  const f = document.createElement('iframe');
-  f.allow = 'autoplay; encrypted-media; picture-in-picture';
-  f.setAttribute('allowfullscreen','');
-  f.title = o.title || 'AdVenture Media reel';
-  f.dataset.lastInfo = '0';
-  f.dataset.mounted  = String(Date.now());
-  f.dataset.state = '';
-  f.src = ytSrc(id, o);          // set last, once permissions are in place
-  f.dataset.loop = o.controls ? '0' : '1';   // ambient frames loop, cinema does not
-  f.dataset.pid  = String(++FRAME_SEQ);
-  f.dataset.want = o.autoplay ? 'play' : 'pause';
-  f.addEventListener('load', ()=>{
-    // subscribe to player events so we can catch "ended" and "paused"
-    try{
-      f.contentWindow.postMessage(
-        JSON.stringify({event:'listening', id:Number(f.dataset.pid), channel:'widget'}), '*');
-    }catch(e){}
-  });
-  FRAMES.push(f);
-  return f;
-}
-
-/* If a player never answers the handshake, YouTube is refusing to serve the
-   embed (a file:// page, a blocked network, an owner level embed restriction).
-   Drop the dead iframe and leave the poster and play mark in place, so the
-   section still reads as designed instead of as a row of black boxes. */
-function guard(frame, host){
-  setTimeout(()=>{
-    if (!frame.isConnected || frame.dataset.ready === '1') return;
-    host.classList.add('noembed');
-    dropFrame(frame);
-  }, 6000);
-}
-
-function cmd(frame, func, args){
-  if (!frame || !frame.contentWindow) return;
-  if (func === 'playVideo')  frame.dataset.want = 'play';
-  if (func === 'pauseVideo'){
-    frame.dataset.want = 'pause';
-    // re-mask at once so a pausing frame never flashes its title bar
-    if (frame.parentElement) frame.parentElement.classList.remove('playing');
-  }
-  try{
-    frame.contentWindow.postMessage(JSON.stringify({event:'command', func:func, args:args||[]}), '*');
-  }catch(e){}
-}
-
-/* cc_load_policy=0 only stops YouTube forcing captions on. A viewer whose
-   account defaults to captions still gets them, so tear the module out. */
-function killCaptions(f){
-  cmd(f, 'unloadModule', ['captions']);   // html5 player
-  cmd(f, 'unloadModule', ['cc']);         // legacy name
-  cmd(f, 'setOption', ['captions', 'track', {}]);
-}
-
-/* Stage sound is sticky: turn it on once and every following chapter keeps it. */
-let SOUND = false;
-let stageSync = null;   // stage() registers its re-apply function here
-let wallPulse = null;   // wall() registers its play/pause sweep here
-
-function dropFrame(f){
-  if (!f) return;
-  const i = FRAMES.indexOf(f);
-  if (i > -1) FRAMES.splice(i,1);
-  f.remove();
-}
-
-window.addEventListener('message', (e)=>{
-  if (typeof e.data !== 'string' || e.origin.indexOf('youtube') === -1) return;
-  let d;
-  try { d = JSON.parse(e.data); } catch(err){ return; }
-  const src = FRAMES.find(x => x.contentWindow === e.source);
-  if (src && src.dataset.ready !== '1'){
-    src.dataset.ready = '1';                 // the player is alive and talking
-    killCaptions(src);
-    if (stageSync) stageSync();              // a new chapter inherits the sound
-  }
-
-  const st = d && d.info && d.info.playerState;
-  if (st === undefined || st === null) return;
-
-  const f = FRAMES.find(x => x.contentWindow === e.source);
-  if (!f || f.dataset.loop !== '1') return;   // cinema player keeps its controls
-
-  f.dataset.state = String(st);
-  f.dataset.lastInfo = String(Date.now());
-
-  /* Unmask only while genuinely playing. Anything else and YouTube may be
-     drawing its title bar, avatar and centre play button. */
-  const host = f.parentElement;
-  if (host && st !== 1) host.classList.remove('playing');
-
-  if (st === 0){                              // ended: straight back to the head
-    cmd(f, 'seekTo', [0, true]);
-    cmd(f, 'playVideo');
-  }
-});
-
-/* A player that stalls goes silent rather than announcing it, so a pause event
-   can never be relied on to restore the mask. While a video really is playing
-   YouTube reports progress several times a second, so treat that stream as a
-   heartbeat: if it stops, assume the video is not playing, put the mask back
-   and keep asking it to resume. */
-function maskWatch(){
-  const now = Date.now();
-  for (let i = 0; i < FRAMES.length; i++){
-    const f = FRAMES[i];
-    if (f.dataset.loop !== '1' || !f.isConnected) continue;
-    const host = f.parentElement;
-    if (!host) continue;
-    /* Fail open. If the player has never said anything at all then the
-       messaging channel is unavailable, and the video is most likely playing
-       happily underneath. Revealing a little chrome beats holding an opaque
-       mask over a banner for ever. */
-    const mounted = Number(f.dataset.mounted) || 0;
-    if (f.dataset.lastInfo === '0' && mounted && now - mounted > 3500){
-      host.classList.add('playing');
-      continue;
-    }
-    const fresh   = now - (Number(f.dataset.lastInfo) || 0) < 2000;
-    const playing = f.dataset.state === '1' && fresh;
-    host.classList.toggle('playing', playing);
-    if (playing || f.dataset.want !== 'play' || document.hidden) continue;
-    if (now - (Number(f.dataset.kicked) || 0) < 1200) continue;
-    f.dataset.kicked = String(now);
-    cmd(f, 'playVideo');
-  }
-}
-// registered in boot(), once the tick scheduler exists
-
-// Resume ambient playback when the tab comes back to the foreground.
-/* Browsers suspend media while a tab is hidden and do not always resume it, so
-   everything is restarted explicitly when the tab comes back to the front. */
+/* Browsers suspend media while a tab is hidden and do not always resume it,
+   so every player is restarted explicitly when the tab comes back. */
 document.addEventListener('visibilitychange', ()=>{
   if (document.hidden) return;
-  FRAMES.forEach(f=>{ if (f.dataset.loop === '1' && f.dataset.want === 'play') cmd(f,'playVideo'); });
+  if (heroVideo) play(heroVideo);
   if (wallPulse) wallPulse();
   if (stageSync) stageSync();
 });
-
-/* ============================================================
-   FILE:// NOTICE
-   YouTube will not serve an embed to a page with no real origin, so opening
-   this file straight off the disk can never play video. Nothing the page can
-   fix, so say so plainly. Never appears once the page is actually hosted.
-   ============================================================ */
-function fileWarning(){
-  if (location.protocol !== 'file:') return;
-  const n = document.createElement('div');
-  n.id = 'filewarn';
-  n.innerHTML = '<b>Video is disabled because this page was opened from a file.</b>'
-    + '<span>YouTube only plays embeds from a hosted page. Run '
-    + '<code>python -m http.server 4321</code> in this folder and open '
-    + '<code>localhost:4321</code>, or view the deployed site.</span>'
-    + '<button aria-label="Dismiss">&#215;</button>';
-  n.querySelector('button').addEventListener('click', ()=> n.remove());
-  document.body.appendChild(n);
-}
 
 /* ============================================================
    HOLD
@@ -1273,20 +1050,14 @@ function heroAmbient(){
   const box = document.getElementById('heroCover');
   const bg  = document.getElementById('heroBg');
   if (!box || RM) return;
-  /* No mask here. This banner is decorative: it sits at 30% opacity behind a
-     veil and vignette, and its iframe is already overscanned so the title and
-     control bars fall outside the frame. Gating it on a play report made a
-     silent player black the whole banner out, which is far worse than the
-     faint chrome the mask was hiding. The poster simply sits underneath. */
-  box.appendChild(poster(HERO_ID, true));
-  const f = mkFrame(HERO_ID, {autoplay:true, mute:true, controls:false, title:'AdVenture Media showreel'});
-  box.appendChild(f);
-  // Deliberately no guard() here. Tearing down the banner embed leaves a dead
-  // hero, which is far worse than a moment of player chrome behind the veil.
+  // Our own file now, so there is no player, no chrome and nothing to mask or
+  // overscan. The poster attribute holds the first frame until it decodes.
+  const v = mkVideo(HERO_FILE, {});
+  box.appendChild(v);
   setTimeout(()=> bg.classList.add('ready'), 260);
-
   // stop paying for it once it is off screen
-  watch(document.getElementById('hero'), on=> cmd(f, on ? 'playVideo' : 'pauseVideo'));
+  watch(document.getElementById('hero'), on=>{ if (on) play(v); else v.pause(); });
+  heroVideo = v;
 }
 
 /* ============================================================
@@ -1559,13 +1330,10 @@ function boot(){
   wall();
   revealer();
   document.getElementById('heroH1').classList.add('in');
-  onTick(maskWatch);
-  setInterval(maskWatch, 700);   // runs even when nothing is scrolling
   scan();                      // first pass immediately
   setTimeout(scan, 260);       // and once more after webfonts settle
 }
 
-fileWarning();
 splitWords();
 statics();
 chrome();
