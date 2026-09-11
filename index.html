@@ -215,7 +215,7 @@ section{position:relative}
 }
 .hero-bg.ready .cover{opacity:.30}
 /* overscan: clips YouTube's title bar and control bar out of frame */
-.hero-bg .cover iframe{position:absolute;top:-13%;left:-5%;width:110%;height:126%;border:0;display:block;pointer-events:none}
+.hero-bg .cover iframe{position:absolute;top:-13%;left:-5%;width:110%;height:126%;border:0;display:block;pointer-events:none;z-index:1}
 .hero-veil{
   position:absolute;inset:0;z-index:1;
   background:
@@ -327,7 +327,7 @@ body.cur-live .screen{cursor:none}
 .pane{position:absolute;inset:0;opacity:0;transition:opacity .85s var(--ease);z-index:1}
 .pane.on{opacity:1;z-index:2}
 .pane video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#000;z-index:1}
-.cover .ph{position:absolute;inset:0;background:var(--ink);z-index:2;transition:opacity .55s var(--ease)}
+.cover .poster{z-index:0}        /* underneath the player, never over it */
 .corner{position:absolute;width:16px;height:16px;z-index:4;pointer-events:none;border-color:var(--bone-faint);border-style:solid;border-width:0}
 .corner.tl{top:9px;left:9px;border-top-width:1px;border-left-width:1px}
 .corner.tr{top:9px;right:9px;border-top-width:1px;border-right-width:1px}
@@ -967,6 +967,7 @@ function mkFrame(id, opts){
   f.setAttribute('allowfullscreen','');
   f.title = o.title || 'AdVenture Media reel';
   f.dataset.lastInfo = '0';
+  f.dataset.mounted  = String(Date.now());
   f.dataset.state = '';
   f.src = ytSrc(id, o);          // set last, once permissions are in place
   f.dataset.loop = o.controls ? '0' : '1';   // ambient frames loop, cinema does not
@@ -1071,6 +1072,15 @@ function maskWatch(){
     if (f.dataset.loop !== '1' || !f.isConnected) continue;
     const host = f.parentElement;
     if (!host) continue;
+    /* Fail open. If the player has never said anything at all then the
+       messaging channel is unavailable, and the video is most likely playing
+       happily underneath. Revealing a little chrome beats holding an opaque
+       mask over a banner for ever. */
+    const mounted = Number(f.dataset.mounted) || 0;
+    if (f.dataset.lastInfo === '0' && mounted && now - mounted > 3500){
+      host.classList.add('playing');
+      continue;
+    }
     const fresh   = now - (Number(f.dataset.lastInfo) || 0) < 2000;
     const playing = f.dataset.state === '1' && fresh;
     host.classList.toggle('playing', playing);
@@ -1272,13 +1282,16 @@ function heroAmbient(){
   const box = document.getElementById('heroCover');
   const bg  = document.getElementById('heroBg');
   if (!box || RM) return;
-  const heroMask = document.createElement('span');
-  heroMask.className = 'ph';               // same opaque mask the stage uses
-  box.appendChild(heroMask);
+  /* No mask here. This banner is decorative: it sits at 30% opacity behind a
+     veil and vignette, and its iframe is already overscanned so the title and
+     control bars fall outside the frame. Gating it on a play report made a
+     silent player black the whole banner out, which is far worse than the
+     faint chrome the mask was hiding. The poster simply sits underneath. */
   box.appendChild(poster(HERO_ID, true));
   const f = mkFrame(HERO_ID, {autoplay:true, mute:true, controls:false, title:'AdVenture Media showreel'});
   box.appendChild(f);
-  guard(f, box);
+  // Deliberately no guard() here. Tearing down the banner embed leaves a dead
+  // hero, which is far worse than a moment of player chrome behind the veil.
   setTimeout(()=> bg.classList.add('ready'), 260);
 
   // stop paying for it once it is off screen
