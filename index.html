@@ -468,6 +468,80 @@ body.cur-live .tile{cursor:none}
 footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 
 /* ============================================================
+   CASE STUDIES
+   ============================================================ */
+#cases{padding:clamp(70px,11vh,140px) var(--gut);border-top:1px solid var(--hair-2)}
+.cs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(18px,2.4vw,38px);margin-top:clamp(34px,5vw,60px)}
+
+.cs-card{
+  display:block;width:100%;text-align:left;padding:0;background:none;border:0;
+  cursor:pointer;color:inherit;
+}
+.cs-media{
+  position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#0d0c12;
+  border:1px solid var(--hair-2);
+  transition:border-color .5s var(--ease);
+}
+.cs-cover{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+}
+/* The film sits over the cover at zero opacity, paused and inert, exactly as on
+   the reference build. Hover on desktop, or scrolling into view on touch, fades
+   it up and starts playback. */
+.cs-film{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  opacity:0;transition:opacity .45s var(--ease);pointer-events:none;
+}
+.cs-card.live .cs-film{opacity:1}
+.cs-card.live .cs-media{border-color:var(--hair)}
+.cs-shade{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,rgba(11,10,16,.55) 0%,transparent 45%);
+  opacity:1;transition:opacity .45s var(--ease);
+}
+.cs-card.live .cs-shade{opacity:.35}
+
+.cs-meta{display:grid;grid-template-columns:auto 1fr;gap:4px clamp(12px,1.4vw,20px);padding-top:clamp(14px,1.7vw,22px)}
+.cs-n{grid-row:1/span 3;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--violet-2);padding-top:.35em}
+.cs-cat{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-faint)}
+.cs-title{
+  font-family:var(--serif);font-weight:500;font-size:clamp(18px,1.75vw,27px);
+  line-height:1.16;letter-spacing:-.02em;margin:0;
+  transition:color .4s var(--ease);
+}
+.cs-card:hover .cs-title{color:var(--violet-2)}
+.cs-foot{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:6px}
+.cs-client{font-family:var(--sans);font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+.cs-cta{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-faint);transition:color .4s var(--ease)}
+.cs-card:hover .cs-cta{color:var(--bone)}
+
+/* ---- the fullscreen study overlay ---- */
+#study{position:fixed;inset:0;z-index:9300;display:none;background:var(--ink);overflow:hidden}
+#study.open{display:block;animation:cinFade .4s var(--ease)}
+.study-x{position:fixed;top:clamp(14px,2vw,26px);right:clamp(14px,2.4vw,34px);z-index:4;background:rgba(11,10,16,.7);backdrop-filter:blur(8px)}
+.study-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.study-in{max-width:980px;margin:0 auto;padding:clamp(60px,9vh,110px) clamp(20px,5vw,40px) clamp(70px,12vh,140px)}
+.study-eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--violet-2)}
+.study-h{font-family:var(--serif);font-weight:500;font-size:clamp(27px,4vw,56px);line-height:1.06;letter-spacing:-.025em;margin:clamp(16px,2vw,24px) 0 clamp(26px,3.4vw,42px)}
+.study-film{width:100%;aspect-ratio:16/9;background:#000;border:1px solid var(--hair);display:block}
+.study-sec{margin-top:clamp(36px,5vw,64px)}
+.study-sec h3{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--bone-faint);margin:0 0 clamp(14px,1.8vw,22px)}
+.study-sec p{margin:0 0 1.1em;font-size:clamp(15px,1.2vw,17.5px);line-height:1.68;color:var(--bone-dim);max-width:68ch}
+.study-sec p:last-child{margin-bottom:0}
+.study-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:clamp(18px,2.6vw,40px);margin-top:clamp(36px,5vw,64px);border-top:1px solid var(--hair-2);padding-top:clamp(24px,3vw,38px)}
+.study-stat .v{font-family:var(--serif);font-weight:500;font-size:clamp(30px,4.2vw,62px);line-height:1;letter-spacing:-.03em;color:var(--bone)}
+.study-stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-dim);margin-top:10px;line-height:1.7}
+.study-list{margin:0;padding:0;list-style:none}
+.study-list li{position:relative;padding-left:22px;margin-bottom:1em;font-size:clamp(15px,1.2vw,17.5px);line-height:1.68;color:var(--bone-dim);max-width:68ch}
+.study-list li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;background:var(--violet-2)}
+.study-list b{color:var(--bone);font-weight:600}
+.study-pending{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-faint);margin-top:clamp(30px,4vw,48px)}
+
+@media (max-width:820px){
+  .cs-grid{grid-template-columns:1fr}
+}
+
+/* ============================================================
    CINEMA OVERLAY
    ============================================================ */
 #cinema{position:fixed;inset:0;z-index:9200;display:none;background:rgba(7,6,11,.93);backdrop-filter:blur(22px)}
@@ -563,7 +637,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
     AdVenture
   </a>
   <div class="nav-r">
-    <a class="pill" href="#wall">The Work</a>
+    <a class="pill" href="#cases">Case Studies</a>
+    <a class="pill" href="#wall">Portfolio</a>
     <a class="pill pill--v" href="mailto:gabrielle@adventureppc.com?subject=Creative%20inquiry">Start a project</a>
   </div>
 </nav>
@@ -660,7 +735,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 <section id="wall">
   <div class="wrap sec-head">
     <div>
-      <span class="label label--v rv" style="display:block;margin-bottom:16px">The Reel Wall</span>
+      <span class="label label--v rv" style="display:block;margin-bottom:16px">Portfolio</span>
       <h2 class="display d-lg rv" data-d="90">Volume, without the waste.</h2>
     </div>
   </div>
@@ -696,6 +771,21 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 </section>
 
 <!-- ============ 06 CAPABILITIES ============ -->
+<!-- ============ CASE STUDIES ============ -->
+<section id="cases">
+  <div class="sec-head">
+    <div>
+      <span class="label label--v rv" style="display:block;margin-bottom:16px">Case Studies</span>
+      <h2 class="display d-lg rv" data-d="90">The work, and<br>what it returned.</h2>
+    </div>
+    <p class="lede rv" data-d="200" style="max-width:34ch">
+      <span id="caseCount"></span> featured projects. Hover any card to watch it move,
+      then open it for the full story.
+    </p>
+  </div>
+  <div class="cs-grid" id="caseGrid"></div>
+</section>
+
 <section id="caps">
   <div class="sec-head">
     <div>
@@ -754,6 +844,16 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   <span class="label">New York · Fort Lauderdale · Philadelphia</span>
 </footer>
 
+<!-- ============ CASE STUDY OVERLAY ============ -->
+<div id="study" role="dialog" aria-modal="true" aria-label="Case study">
+  <button class="cin-x study-x" id="studyX" aria-label="Close case study">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+      <path d="M1 1l13 13M14 1L1 14" stroke="currentColor" stroke-width="1.3"/>
+    </svg>
+  </button>
+  <div class="study-scroll" id="studyScroll"></div>
+</div>
+
 <!-- ============ CINEMA OVERLAY ============ -->
 <div id="cinema" role="dialog" aria-modal="true" aria-label="Video player">
   <div class="cin-bar">
@@ -782,6 +882,50 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 // HERO banner film. Plays muted behind the headline. Separate from the
 // stage chapters so it can be swapped without touching Featured Work.
 const HERO_FILE = 'media/hero/sizzle.mp4';   // AMG sizzle reel
+
+// CASE STUDIES. `study` holds the written write-up; a case without one still
+// gets a card and opens to its film, so nothing on screen is invented.
+const CASES = [
+  { id:'exotic-nutrition', client:'Exotic Nutrition', cat:'Content Series',
+    title:'A skunk, a podcast, and a 47x ROAS.',
+    film:'media/stage/exotic-nutrition-podcast.mp4',
+    cover:'media/case/exotic-nutrition.jpg',
+    study:{
+      heading:'Cutting through the noise: how an animal podcast drove a 47x ROAS',
+      body:[
+        ['The pattern interrupt', [
+          'The default state of a modern consumer is scroll-past. Skipping ads is not even a decision anymore. It is practically cruise control. So before anything else, the creative has one job: interrupt that autopilot.',
+          'A skunk hosting a podcast is weird. It is jarring, in the best way. That jolt forces the exact audience we are targeting to actually stop and process what they are seeing, instead of scrolling straight through it.',
+          'Because the creative is genuinely entertaining, it holds them there. That kind of engagement lowers the guard: you stop feeling like you are being sold to and start feeling like you are being entertained, and that erases the friction standing between a viewer and a purchase.'
+        ]]
+      ],
+      stats:[['47.2x','Peak ROAS'],['$33K+','Revenue on $1.3K spend'],['73%','Video retention']],
+      impact:{
+        intro:'Episode 1 was a runaway success that prompted the immediate commissioning of the full season. More importantly the numbers held up over a sustained five month period, March to July, proving this was not a low spend fluke but a scalable, evergreen asset.',
+        points:[
+          '<b>Peak 47.20x ROAS.</b> A top of funnel prospecting ad sustained a 47.20x return on Meta, driving nearly $10,000 in purchase value on just $200 of spend.',
+          '<b>Consistent volume and scale.</b> Other active ad sets maintained phenomenal efficiency at higher spend, driving over $33,000 in revenue from just $1,284 in ad spend, a 25.88x ROAS.',
+          '<b>73% video retention.</b> On early Google Demand Gen campaigns, over 73% of viewers watched the entire 30 second episode.',
+          '<b>20%+ hook rates.</b> Consistent scroll stopping power across Meta, driving high value purchases even on early brand awareness campaigns.'
+        ]
+      }
+    } },
+
+  { id:'mitogrow', client:'MitoGrow', cat:'YouTube Campaign',
+    title:'The custom jingle that drove a 72% view rate, for less than a penny.',
+    film:'media/stage/mitogrow-spot-a.mp4',
+    cover:'media/case/mitogrow.jpg' },
+
+  { id:'nova-devices', client:'Nova Devices', cat:'Product Launch',
+    title:'Launching a flagship product to a category of one.',
+    film:'media/case/nova-devices.mp4',
+    cover:'media/case/nova-devices.jpg' },
+
+  { id:'circuit', client:'Circuit', cat:'Visual Identity',
+    title:'Building the visual language for an AI hardware brand.',
+    film:'media/case/circuit.mp4',
+    cover:'media/case/circuit.jpg' }
+];
 
 // CINEMA STAGE chapters (the flagships)
 const CHAPTERS = [
@@ -1262,6 +1406,133 @@ function wall(){
   window.__wallTiles = tiles;
 }
 
+
+/* ============================================================
+   CASE STUDY CARDS
+   A cover image with the film layered over it at zero opacity and paused.
+   Desktop fades the film up on hover intent; touch devices have no hover, so
+   the identical state change is driven by the card scrolling into view.
+   ============================================================ */
+function cases(){
+  const grid = document.getElementById('caseGrid');
+  if (!grid) return;
+  const cards = [];
+  const n = document.getElementById('caseCount');
+  if (n) n.textContent = String(CASES.length).padStart(2,'0');
+
+  CASES.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'cs-card rv';
+    b.dataset.d = String(i * 80);
+    b.setAttribute('aria-label', 'Open the ' + c.client + ' case study');
+    b.innerHTML =
+      '<div class="cs-media">' +
+        '<img class="cs-cover" src="'+c.cover+'" alt="" loading="lazy" decoding="async">' +
+        '<span class="cs-shade"></span>' +
+      '</div>' +
+      '<div class="cs-meta">' +
+        '<span class="cs-n">'+String(i+1).padStart(2,'0')+'</span>' +
+        '<span class="cs-cat">'+c.cat+'</span>' +
+        '<h3 class="cs-title">'+c.title+'</h3>' +
+        '<div class="cs-foot"><span class="cs-client">'+c.client+'</span>' +
+        '<span class="cs-cta">View case study</span></div>' +
+      '</div>';
+
+    // preload none: nothing is fetched until the card is actually woken
+    const v = mkVideo(c.film, {preload:'none'});
+    v.className = 'cs-film';
+    v.removeAttribute('poster');
+    b.querySelector('.cs-media').insertBefore(v, b.querySelector('.cs-shade'));
+
+    grid.appendChild(b);
+    const rec = {el:b, v:v, c:c, live:false};
+    cards.push(rec);
+
+    b.addEventListener('click', ()=> openStudy(c));
+    if (!COARSE){
+      b.addEventListener('mouseenter', ()=> wake(rec, true));
+      b.addEventListener('mouseleave', ()=> wake(rec, false));
+      b.addEventListener('focus', ()=> wake(rec, true));
+      b.addEventListener('blur',  ()=> wake(rec, false));
+    }
+  });
+
+  /* One state change, two triggers. Pausing deliberately does not rewind, so
+     coming back to a card resumes the shot rather than restarting it. */
+  function wake(rec, on){
+    if (rec.live === on) return;
+    rec.live = on;
+    rec.el.classList.toggle('live', on);
+    if (on){
+      if (rec.v.preload === 'none'){ rec.v.preload = 'auto'; rec.v.load(); }
+      play(rec.v);
+    } else rec.v.pause();
+  }
+
+  // touch: a card that scrolls well into view plays itself
+  if (COARSE){
+    onTick(function(){
+      const vh = window.innerHeight;
+      for (let i=0;i<cards.length;i++){
+        const rec = cards[i];
+        const r = rec.el.getBoundingClientRect();
+        const seen = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+        wake(rec, r.height > 0 && seen / r.height > 0.55);
+      }
+    });
+  }
+  window.__caseCards = cards;
+}
+
+/* ---- the study overlay ---- */
+const study = document.getElementById('study');
+function openStudy(c){
+  const wrap = document.getElementById('studyScroll');
+  let h = '<div class="study-in">';
+  h += '<div class="study-eyebrow">'+c.client+' &middot; '+c.cat+'</div>';
+  h += '<h2 class="study-h">'+((c.study && c.study.heading) || c.title)+'</h2>';
+  h += '<video class="study-film" controls playsinline preload="metadata" poster="'+c.cover+'" src="'+c.film+'"></video>';
+  if (c.study){
+    (c.study.body||[]).forEach(function(sec){
+      h += '<div class="study-sec"><h3>'+sec[0]+'</h3>';
+      sec[1].forEach(function(p){ h += '<p>'+p+'</p>'; });
+      h += '</div>';
+    });
+    if (c.study.stats){
+      h += '<div class="study-stats">';
+      c.study.stats.forEach(function(st){
+        h += '<div class="study-stat"><div class="v">'+st[0]+'</div><div class="k">'+st[1]+'</div></div>';
+      });
+      h += '</div>';
+    }
+    if (c.study.impact){
+      h += '<div class="study-sec"><h3>The impact</h3><p>'+c.study.impact.intro+'</p><ul class="study-list">';
+      c.study.impact.points.forEach(function(p){ h += '<li>'+p+'</li>'; });
+      h += '</ul></div>';
+    }
+  } else {
+    h += '<p class="study-pending">Written case study in progress</p>';
+  }
+  h += '</div>';
+  wrap.innerHTML = h;
+  wrap.scrollTop = 0;
+  study.classList.add('open');
+  document.body.classList.add('no-scroll');
+  (window.__caseCards||[]).forEach(function(r){ r.v.pause(); });
+  document.getElementById('studyX').focus();
+}
+function closeStudy(){
+  study.classList.remove('open');
+  document.body.classList.remove('no-scroll');
+  const v = document.getElementById('studyScroll').querySelector('video');
+  if (v){ v.pause(); v.removeAttribute('src'); v.load(); }
+  document.getElementById('studyScroll').innerHTML = '';
+}
+document.getElementById('studyX').addEventListener('click', closeStudy);
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && study.classList.contains('open')) closeStudy();
+});
+
 /* ============================================================
    CINEMA OVERLAY
    ============================================================ */
@@ -1328,6 +1599,7 @@ function boot(){
   heroAmbient();
   stage();
   wall();
+  cases();
   revealer();
   document.getElementById('heroH1').classList.add('in');
   scan();                      // first pass immediately
