@@ -975,15 +975,15 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 
 // HERO banner film. Plays muted behind the headline. Separate from the
 // stage chapters so it can be swapped without touching Featured Work.
-const HERO_FILE = 'media/hero/sizzle.mp4';   // AMG sizzle reel
+const HERO_FILE = '/media/hero/sizzle.mp4';   // AMG sizzle reel
 
 // CASE STUDIES. `study` holds the written write-up; a case without one still
 // gets a card and opens to its film, so nothing on screen is invented.
 const CASES = [
   { id:'exotic-nutrition', client:'Exotic Nutrition', cat:'Content Series',
     title:'A skunk, a podcast, and a 47x ROAS.',
-    film:'media/stage/exotic-nutrition-podcast.mp4',
-    cover:'media/case/exotic-nutrition.jpg',
+    film:'/media/stage/exotic-nutrition-podcast.mp4',
+    cover:'/media/case/exotic-nutrition.jpg',
     study:{
       heading:'Cutting through the noise: how an animal podcast drove a 47x ROAS',
       body:[
@@ -1007,22 +1007,22 @@ const CASES = [
 
   { id:'tpg-creations', client:'TPG Creations', cat:'Streaming Platforms',
     title:'An original score, written for this commercial and no other.',
-    film:'media/stage/glitter-musical.mp4',
-    cover:'media/case/tpg-creations.jpg',
+    film:'/media/stage/glitter-musical.mp4',
+    cover:'/media/case/tpg-creations.jpg',
     board:{
-      finalPoster:'media/board/tpg-final.jpg',
+      finalPoster:'/media/board/tpg-final.jpg',
       intro:'Every frame below came from the deck we pitched before a single shot existed. Set them against the commercial above and watch how little changed.',
       frames:[
-        { img:'media/board/tpg-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:05',
+        { img:'/media/board/tpg-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:05',
           cue:'Piano keys fade in',
           desc:'From below, almost a child' + "’" + 's eye view, we look up at mom as she reads the school supply list on her phone. Her expression shifts from calm to controlled panic. One word on that list has stopped her cold. The camera angle makes her larger than life, which is exactly how this moment feels to her.',
           lines:[['Mom speaks','Okay, okay. Glue sticks, markers, GLITTER?!'],
                  ['Mom sings','Glitter on the carpet, glitter in their hair']] },
-        { img:'media/board/tpg-2.jpg', scene:'Scene 2', name:'The Breakdown', time:'0:05 to 0:15',
+        { img:'/media/board/tpg-2.jpg', scene:'Scene 2', name:'The Breakdown', time:'0:05 to 0:15',
           cue:'Orchestra ensemble in full swing',
           desc:'Framed by the doorway, mom kneels dramatically at an overflowing laundry hamper. One arm flung wide, head thrown back, glitter clearly casted throughout her kids clothing, all of her fingertips like it' + "’" + 's evidence. She is performing her grievances to no one, and absolutely everyone.',
           lines:[['Mom sings','glitter in the laundry, it gets EVERYWHERE']] },
-        { img:'media/board/tpg-3.jpg', scene:'Scene 3', name:'The Arc', time:'0:15 to 0:20',
+        { img:'/media/board/tpg-3.jpg', scene:'Scene 3', name:'The Arc', time:'0:15 to 0:20',
           cue:'The orchestra' + "’" + 's big finale',
           desc:'Pitch black. A single spotlight from above. Mom stands center frame, one arm raised high, Glitter Stix held aloft like a trophy. This is her operatic peak. The moment the villain song becomes a victory anthem. The product catches the light and sparkles. She has found the answer.',
           lines:[['Mom sings','But NOT this year, no not this time, my kid gets glitterstix, and it' + "’" + 's fine!']] }
@@ -1031,8 +1031,8 @@ const CASES = [
 
   { id:'mitogrow', client:'MitoGrow', cat:'YouTube Campaign',
     title:'The custom jingle that drove a 72% view rate, for less than a penny.',
-    film:'media/stage/mitogrow-spot-a.mp4',
-    cover:'media/case/mitogrow.jpg',
+    film:'/media/stage/mitogrow-spot-a.mp4',
+    cover:'/media/case/mitogrow.jpg',
     study:{
       heading:'Worth watching: how a custom jingle drove 312,834 views at under a penny each',
       body:[
@@ -1056,29 +1056,29 @@ const CASES = [
 
   { id:'augusta-lawncare', client:'Augusta Lawncare', cat:'Local TV',
     title:'A mixed-world composite, built from the streets of West Chester.',
-    film:'media/stage/augusta-christmas-v7.mp4',
-    cover:'media/case/augusta-lawncare.jpg' }
+    film:'/media/stage/augusta-christmas-v7.mp4',
+    cover:'/media/case/augusta-lawncare.jpg' }
 ];
 
 // CINEMA STAGE chapters (the flagships)
 const CHAPTERS = [
-  { file:'media/stage/exotic-nutrition-podcast.mp4', client:'Exotic Nutrition', metric:'31x Blended ROAS',
+  { file:'/media/stage/exotic-nutrition-podcast.mp4', client:'Exotic Nutrition', metric:'31x Blended ROAS',
     disc:'YouTube and Amazon Ads',
     note:'Hook engineered for the scroll. The first three seconds decide whether the rest of the spot gets watched at all.' },
 
-  { file:'media/stage/glitter-musical.mp4', client:'TPG Creations', metric:'Custom Musical Production',
+  { file:'/media/stage/glitter-musical.mp4', client:'TPG Creations', metric:'Custom Musical Production',
     disc:'Streaming Platforms',
     note:'An original score written for this commercial. No stock audio, no library cues, composed for this client and no other.' },
 
-  { file:'media/stage/curaprox-recut.mp4', client:'Curaprox', metric:'Big Ideas and Custom Animation',
+  { file:'/media/stage/curaprox-recut.mp4', client:'Curaprox', metric:'Big Ideas and Custom Animation',
     disc:'YouTube and Google Ads',
     note:'An idea born out of child-like imagination. A vending machine that dispenses a custom-color combo toothbrush to promote Curaprox’s mission of promoting individuality.' },
 
-  { file:'media/stage/augusta-christmas-v7.mp4', client:'Augusta Lawncare', metric:'Mixed Media Composite',
+  { file:'/media/stage/augusta-christmas-v7.mp4', client:'Augusta Lawncare', metric:'Mixed Media Composite',
     disc:'Local TV Ads',
     note:'A mixed-world composite born from reality. Using Google Earth, our team hunted for references of the local architecture, so that the community of West Chester knew that Augusta was truly their best local choice.' },
 
-  { file:'media/stage/mitogrow-spot-a.mp4', client:'MitoGrow', metric:'Under a Penny Per View',
+  { file:'/media/stage/mitogrow-spot-a.mp4', client:'MitoGrow', metric:'Under a Penny Per View',
     disc:'Meta and YouTube Ads',
     note:'A perplexing hook to win the viewer’s attention. Viewers were watching the entire video, YouTube recognized this and essentially subsidized the ad because we kept people on their platform. If your creative is compelling enough, the internet will distribute it practically for free (or less than a penny).' }
 ];
@@ -1087,19 +1087,19 @@ const CHAPTERS = [
 // REEL WALL tiles. Awaiting the full reel list; extend this array.
 const REELS = [
   // Row 1: full bleed opener
-  { file:'media/wall/happsy1-v5.mp4',             client:'Happsy',                 metric:'Commercial',        span:6 },
+  { file:'/media/wall/happsy1-v5.mp4',             client:'Happsy',                 metric:'Commercial',        span:6 },
   // Row 2
-  { file:'media/wall/lynx-golf.mp4',              client:'Lynx Golf',              metric:'Commercial',        span:3 },
-  { file:'media/wall/curaprox-crave.mp4',         client:'Curaprox',               metric:'Crave Your Color',  span:3 },
+  { file:'/media/wall/lynx-golf.mp4',              client:'Lynx Golf',              metric:'Commercial',        span:3 },
+  { file:'/media/wall/curaprox-crave.mp4',         client:'Curaprox',               metric:'Crave Your Color',  span:3 },
   // Row 3
-  { file:'media/wall/feazel.mp4',                 client:'Feazel',                 metric:'Commercial',        span:2 },
-  { file:'media/wall/solar-energy-solutions.mp4', client:'Solar Energy Solutions', metric:'Commercial',        span:2 },
-  { file:'media/wall/leek-uh-reesh.mp4',          client:'Licorice.com',           metric:'Commercial',        span:2 },
+  { file:'/media/wall/feazel.mp4',                 client:'Feazel',                 metric:'Commercial',        span:2 },
+  { file:'/media/wall/solar-energy-solutions.mp4', client:'Solar Energy Solutions', metric:'Commercial',        span:2 },
+  { file:'/media/wall/leek-uh-reesh.mp4',          client:'Licorice.com',           metric:'Commercial',        span:2 },
   // Row 4: three verticals sit flush beside one wide
-  { file:'media/wall/miadonna-v4.mp4',            client:'MiaDonna',               metric:'Creator UGC',       span:1, vert:true },
-  { file:'media/wall/happsy.mp4',                 client:'Happsy',                 metric:'Creator UGC',       span:1, vert:true },
-  { file:'media/wall/male-ugc-july.mp4',          client:'Happsy',                 metric:'Creator UGC',       span:1, vert:true },
-  { file:'media/wall/valentine-b.mp4',            client:'Licorice.com',           metric:'Valentine’s Day',  span:3 }
+  { file:'/media/wall/miadonna-v4.mp4',            client:'MiaDonna',               metric:'Creator UGC',       span:1, vert:true },
+  { file:'/media/wall/happsy.mp4',                 client:'Happsy',                 metric:'Creator UGC',       span:1, vert:true },
+  { file:'/media/wall/male-ugc-july.mp4',          client:'Happsy',                 metric:'Creator UGC',       span:1, vert:true },
+  { file:'/media/wall/valentine-b.mp4',            client:'Licorice.com',           metric:'Valentine’s Day',  span:3 }
 ];
 
 
@@ -1722,7 +1722,7 @@ function boardInit(root){
 /* ---- the study overlay ---- */
 const study = document.getElementById('study');
 let boardLive = null;
-function openStudy(c){
+function openStudy(c, fromURL){
   const wrap = document.getElementById('studyScroll');
   let h = '<div class="study-in">';
   h += '<div class="study-eyebrow">'+c.client+' &middot; '+c.cat+'</div>';
@@ -1757,18 +1757,40 @@ function openStudy(c){
   boardLive = boardInit(wrap);
   study.classList.add('open');
   document.body.classList.add('no-scroll');
+  if (!fromURL) setPath('/work/' + c.id);
   (window.__caseCards||[]).forEach(function(r){ r.v.pause(); });
   document.getElementById('studyX').focus();
 }
-function closeStudy(){
+function closeStudy(fromURL){
   if (boardLive){ boardLive.stop(); boardLive = null; }
   study.classList.remove('open');
   document.body.classList.remove('no-scroll');
   const v = document.getElementById('studyScroll').querySelector('video');
   if (v){ v.pause(); v.removeAttribute('src'); v.load(); }
   document.getElementById('studyScroll').innerHTML = '';
+  if (!fromURL) setPath('/');
 }
-document.getElementById('studyX').addEventListener('click', closeStudy);
+
+/* ---- shareable case study URLs ----
+   Each study has its own address, so a rep can send a prospect straight to
+   one. vercel.json rewrites /work/* back to this page, so these are real
+   links rather than fragments, and the back button behaves. */
+function setPath(p){
+  if (location.pathname === p) return;
+  try { history.pushState({}, '', p + location.search); } catch(e){}
+}
+function caseFromPath(){
+  const m = location.pathname.match(/^\/work\/([A-Za-z0-9-]+)\/?$/);
+  return m ? CASES.find(function(c){ return c.id === m[1]; }) : null;
+}
+function syncFromPath(){
+  const c = caseFromPath();
+  if (c) openStudy(c, true);                              // also handles study to study
+  else if (study.classList.contains('open')) closeStudy(true);
+}
+window.addEventListener('popstate', syncFromPath);
+// wrapped, or the click Event lands in fromURL and the address never resets
+document.getElementById('studyX').addEventListener('click', function(){ closeStudy(); });
 document.addEventListener('keydown', function(e){
   if (!study.classList.contains('open')) return;
   if (e.key === 'Escape') { closeStudy(); return; }
@@ -1845,6 +1867,11 @@ function boot(){
   wall();
   cases();
   revealer();
+  if (caseFromPath()){
+    const sec = document.getElementById('cases');
+    if (sec) sec.scrollIntoView();     // so closing lands on the gallery
+    syncFromPath();
+  }
   document.getElementById('heroH1').classList.add('in');
   scan();                      // first pass immediately
   setTimeout(scan, 260);       // and once more after webfonts settle
