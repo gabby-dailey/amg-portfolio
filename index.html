@@ -535,7 +535,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 .study-list li{position:relative;padding-left:22px;margin-bottom:1em;font-size:clamp(15px,1.2vw,17.5px);line-height:1.68;color:var(--bone-dim);max-width:68ch}
 .study-list li::before{content:'';position:absolute;left:0;top:.62em;width:7px;height:1px;background:var(--violet-2)}
 .study-list b{color:var(--bone);font-weight:600}
-.study-pending{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-faint);margin-top:clamp(30px,4vw,48px)}
+.study-pending{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-dim);margin-top:clamp(30px,4vw,48px)}
 
 @media (max-width:820px){
   .cs-grid{grid-template-columns:1fr}
@@ -544,15 +544,24 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 /* ============================================================
    STORYBOARD CAROUSEL
    ============================================================ */
-.bd{margin-top:clamp(36px,5vw,64px)}
+.bd{
+  margin-top:clamp(36px,5vw,64px);
+  /* steps outside the 980px reading column: the frames and their notes want
+     far more room than body copy does */
+  width:min(1440px,92vw);margin-left:50%;transform:translateX(-50%);
+}
+.bd .study-sec p{max-width:none}
 .bd-stage{
   position:relative;margin-top:clamp(22px,3vw,34px);
-  height:clamp(230px,30vw,430px);
+  height:clamp(230px,32vw,520px);
   display:flex;align-items:center;justify-content:center;
   perspective:1400px;
+  /* the flanking frames are meant to run off the edges; clip them here so they
+     never push the page into a horizontal scroll */
+  overflow:hidden;
 }
 .bd-slide{
-  position:absolute;top:50%;left:50%;margin:0;width:min(62%,620px);
+  position:absolute;top:50%;left:50%;margin:0;width:min(56%,820px);
   transform:translate(-50%,-50%) scale(.74);
   opacity:0;pointer-events:none;cursor:pointer;
   transition:transform .75s var(--ease),opacity .6s var(--ease),filter .6s var(--ease);
@@ -584,9 +593,9 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 .bd-dot:hover i{background:var(--bone-faint)}
 .bd-dot.is-on i{background:var(--violet-2)}
 
-.bd-detail{position:relative;margin-top:clamp(20px,2.6vw,30px);min-height:190px}
+.bd-detail{display:grid;margin-top:clamp(20px,2.6vw,30px)}
 .bd-note{
-  position:absolute;inset:0;opacity:0;pointer-events:none;
+  grid-area:1/1;opacity:0;pointer-events:none;
   transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease);
 }
 .bd-note.is-on{opacity:1;pointer-events:auto;transform:none}
@@ -595,13 +604,13 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:#fff;background:var(--violet);padding:6px 12px;
 }
-.bd-cue{font-family:var(--sans);font-style:italic;font-size:13.5px;color:var(--bone-faint)}
-.bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:64ch}
+.bd-cue{font-family:var(--sans);font-style:italic;font-size:14px;color:var(--bone-dim)}
+.bd-note p{margin:0 0 18px;font-size:clamp(15px,1.15vw,17px);line-height:1.7;color:var(--bone-dim);max-width:112ch}
 .bd-line{
   display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;
   border-left:2px solid var(--violet);padding:7px 0 7px 14px;margin-top:8px;
 }
-.bd-line .who{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-faint);flex:0 0 auto}
+.bd-line .who{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--violet-2);flex:0 0 auto;min-width:88px}
 .bd-line .say{font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.15vw,17px);color:var(--bone);line-height:1.45}
 
 @media (max-width:760px){
@@ -990,6 +999,7 @@ const CASES = [
     film:'media/stage/glitter-musical.mp4',
     cover:'media/case/tpg-creations.jpg',
     board:{
+      finalPoster:'media/board/tpg-final.jpg',
       intro:'Every frame below came from the deck we pitched before a single shot existed. The finished commercial is the last slide in the sequence. Watch how little changed.',
       frames:[
         { img:'media/board/tpg-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:05',
@@ -1614,7 +1624,7 @@ function boardHTML(c){
          '</figure>';
   });
   h += '<figure class="bd-slide bd-final" data-i="'+f.length+'">' +
-         '<video muted loop playsinline preload="none" poster="'+c.cover+'" src="'+c.film+'"></video>' +
+         '<video muted loop playsinline preload="none" poster="'+(c.board.finalPoster||c.cover)+'" src="'+c.film+'"></video>' +
          '<figcaption class="bd-tag">The finished commercial</figcaption>' +
        '</figure>';
   h += '</div>';
@@ -1715,7 +1725,7 @@ function openStudy(c){
       c.study.impact.points.forEach(function(p){ h += '<li>'+p+'</li>'; });
       h += '</ul></div>';
     }
-  } else {
+  } else if (!c.board){
     h += '<p class="study-pending">Written case study in progress</p>';
   }
   h += '</div>';
