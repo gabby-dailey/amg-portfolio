@@ -542,6 +542,80 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 }
 
 /* ============================================================
+   STORYBOARD CAROUSEL
+   ============================================================ */
+.bd{margin-top:clamp(36px,5vw,64px)}
+.bd-stage{
+  position:relative;margin-top:clamp(22px,3vw,34px);
+  height:clamp(230px,30vw,430px);
+  display:flex;align-items:center;justify-content:center;
+  perspective:1400px;
+}
+.bd-slide{
+  position:absolute;top:50%;left:50%;margin:0;width:min(62%,620px);
+  transform:translate(-50%,-50%) scale(.74);
+  opacity:0;pointer-events:none;cursor:pointer;
+  transition:transform .75s var(--ease),opacity .6s var(--ease),filter .6s var(--ease);
+  filter:saturate(.5) brightness(.6);
+}
+.bd-slide img,.bd-slide video{
+  display:block;width:100%;aspect-ratio:16/9;object-fit:cover;
+  border:1px solid var(--hair);background:#0d0c12;
+  box-shadow:0 30px 70px -28px rgba(0,0,0,.95);
+}
+/* the two either side sit back and to the edges */
+.bd-slide.is-prev{opacity:.5;pointer-events:auto;transform:translate(-128%,-50%) scale(.74) rotateY(14deg)}
+.bd-slide.is-next{opacity:.5;pointer-events:auto;transform:translate(28%,-50%) scale(.74) rotateY(-14deg)}
+.bd-slide.is-on{
+  opacity:1;pointer-events:auto;z-index:3;filter:none;
+  transform:translate(-50%,-50%) scale(1);
+}
+.bd-tag{
+  position:absolute;left:0;right:0;bottom:0;padding:10px 14px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--bone);background:linear-gradient(to top,rgba(11,10,16,.9),transparent);
+  opacity:0;transition:opacity .5s var(--ease);
+}
+.bd-slide.is-on .bd-tag{opacity:1}
+
+.bd-rail{display:flex;justify-content:center;gap:10px;margin-top:clamp(16px,2vw,24px)}
+.bd-dot{padding:8px 4px;background:none;border:0;cursor:pointer;line-height:0}
+.bd-dot i{display:block;width:34px;height:2px;background:var(--hair);transition:background .4s var(--ease)}
+.bd-dot:hover i{background:var(--bone-faint)}
+.bd-dot.is-on i{background:var(--violet-2)}
+
+.bd-detail{position:relative;margin-top:clamp(20px,2.6vw,30px);min-height:190px}
+.bd-note{
+  position:absolute;inset:0;opacity:0;pointer-events:none;
+  transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease);
+}
+.bd-note.is-on{opacity:1;pointer-events:auto;transform:none}
+.bd-meta{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.bd-time{
+  font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:#fff;background:var(--violet);padding:6px 12px;
+}
+.bd-cue{font-family:var(--sans);font-style:italic;font-size:13.5px;color:var(--bone-faint)}
+.bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:64ch}
+.bd-line{
+  display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;
+  border-left:2px solid var(--violet);padding:7px 0 7px 14px;margin-top:8px;
+}
+.bd-line .who{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--bone-faint);flex:0 0 auto}
+.bd-line .say{font-family:var(--serif);font-style:italic;font-size:clamp(14px,1.15vw,17px);color:var(--bone);line-height:1.45}
+
+@media (max-width:760px){
+  .bd-stage{height:clamp(190px,52vw,280px)}
+  .bd-slide{width:76%}
+  .bd-slide.is-prev{transform:translate(-142%,-50%) scale(.7) rotateY(12deg)}
+  .bd-slide.is-next{transform:translate(42%,-50%) scale(.7) rotateY(-12deg)}
+  .bd-detail{min-height:250px}
+}
+@media (prefers-reduced-motion:reduce){
+  .bd-slide{transition:opacity .2s linear}
+}
+
+/* ============================================================
    CINEMA OVERLAY
    ============================================================ */
 #cinema{position:fixed;inset:0;z-index:9200;display:none;background:rgba(7,6,11,.93);backdrop-filter:blur(22px)}
@@ -914,7 +988,25 @@ const CASES = [
   { id:'tpg-creations', client:'TPG Creations', cat:'Streaming Platforms',
     title:'An original score, written for this commercial and no other.',
     film:'media/stage/glitter-musical.mp4',
-    cover:'media/case/tpg-creations.jpg' },
+    cover:'media/case/tpg-creations.jpg',
+    board:{
+      intro:'Every frame below came from the deck we pitched before a single shot existed. The finished commercial is the last slide in the sequence. Watch how little changed.',
+      frames:[
+        { img:'media/board/tpg-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:05',
+          cue:'Piano keys fade in',
+          desc:'From below, almost a child' + "’" + 's eye view, we look up at mom as she reads the school supply list on her phone. Her expression shifts from calm to controlled panic. One word on that list has stopped her cold. The camera angle makes her larger than life, which is exactly how this moment feels to her.',
+          lines:[['Mom speaks','Okay, okay. Glue sticks, markers, GLITTER?!'],
+                 ['Mom sings','Glitter on the carpet, glitter in their hair']] },
+        { img:'media/board/tpg-2.jpg', scene:'Scene 2', name:'The Breakdown', time:'0:05 to 0:15',
+          cue:'Orchestra ensemble in full swing',
+          desc:'Framed by the doorway, mom kneels dramatically at an overflowing laundry hamper. One arm flung wide, head thrown back, glitter clearly casted throughout her kids clothing, all of her fingertips like it' + "’" + 's evidence. She is performing her grievances to no one, and absolutely everyone.',
+          lines:[['Mom sings','glitter in the laundry, it gets EVERYWHERE']] },
+        { img:'media/board/tpg-3.jpg', scene:'Scene 3', name:'The Arc', time:'0:15 to 0:20',
+          cue:'The orchestra' + "’" + 's big finale',
+          desc:'Pitch black. A single spotlight from above. Mom stands center frame, one arm raised high, Glitter Stix held aloft like a trophy. This is her operatic peak. The moment the villain song becomes a victory anthem. The product catches the light and sparkles. She has found the answer.',
+          lines:[['Mom sings','But NOT this year, no not this time, my kid gets glitterstix, and it' + "’" + 's fine!']] }
+      ]
+    } },
 
   { id:'mitogrow', client:'MitoGrow', cat:'YouTube Campaign',
     title:'The custom jingle that drove a 72% view rate, for less than a penny.',
@@ -1504,14 +1596,107 @@ function cases(){
   window.__caseCards = cards;
 }
 
+
+/* ---- storyboard carousel ----
+   Three pitch frames and then the finished film, one at a time in the centre
+   with its neighbours set back. It advances itself so each frame gets its
+   moment, pauses while the cursor is on it, and hands over control for good
+   the first time someone clicks. */
+function boardHTML(c){
+  const f = c.board.frames;
+  let h = '<div class="bd" data-case="'+c.id+'">';
+  h += '<div class="study-sec"><h3>From pitch to final</h3><p>'+c.board.intro+'</p></div>';
+  h += '<div class="bd-stage">';
+  f.forEach(function(fr,i){
+    h += '<figure class="bd-slide" data-i="'+i+'">' +
+           '<img src="'+fr.img+'" alt="'+fr.scene+', '+fr.name+'" loading="lazy" decoding="async">' +
+           '<figcaption class="bd-tag">'+fr.scene+' &middot; '+fr.name+'</figcaption>' +
+         '</figure>';
+  });
+  h += '<figure class="bd-slide bd-final" data-i="'+f.length+'">' +
+         '<video muted loop playsinline preload="none" poster="'+c.cover+'" src="'+c.film+'"></video>' +
+         '<figcaption class="bd-tag">The finished commercial</figcaption>' +
+       '</figure>';
+  h += '</div>';
+
+  h += '<div class="bd-rail">';
+  for (let i=0;i<=f.length;i++) h += '<button class="bd-dot" data-go="'+i+'" aria-label="Frame '+(i+1)+'"><i></i></button>';
+  h += '</div>';
+
+  h += '<div class="bd-detail">';
+  f.forEach(function(fr,i){
+    h += '<div class="bd-note" data-i="'+i+'">' +
+           '<div class="bd-meta"><span class="bd-time">'+fr.time+'</span><span class="bd-cue">'+fr.cue+'</span></div>' +
+           '<p>'+fr.desc+'</p>' +
+           fr.lines.map(function(l){
+             return '<div class="bd-line"><span class="who">'+l[0]+'</span><span class="say">'+l[1]+'</span></div>';
+           }).join('') +
+         '</div>';
+  });
+  h += '<div class="bd-note" data-i="'+f.length+'">' +
+         '<div class="bd-meta"><span class="bd-time">The result</span><span class="bd-cue">What shipped</span></div>' +
+         '<p>Same beats, same staging, same joke. The pitch was not a mood board, it was the plan.</p>' +
+       '</div>';
+  h += '</div></div>';
+  return h;
+}
+
+function boardInit(root){
+  const bd = root.querySelector('.bd');
+  if (!bd) return null;
+  const slides = [].slice.call(bd.querySelectorAll('.bd-slide'));
+  const notes  = [].slice.call(bd.querySelectorAll('.bd-note'));
+  const dots   = [].slice.call(bd.querySelectorAll('.bd-dot'));
+  const film   = bd.querySelector('.bd-final video');
+  let at = -1, timer = null, manual = false;
+
+  function show(i){
+    if (i === at) return;
+    at = i;
+    slides.forEach(function(s,k){
+      s.classList.remove('is-on','is-prev','is-next');
+      if (k === i) s.classList.add('is-on');
+      else if (k === (i + slides.length - 1) % slides.length) s.classList.add('is-prev');
+      else if (k === (i + 1) % slides.length) s.classList.add('is-next');
+    });
+    notes.forEach(function(nd,k){ nd.classList.toggle('is-on', k === i); });
+    dots.forEach(function(d,k){ d.classList.toggle('is-on', k === i); });
+    // the film only runs while it is the one on screen
+    if (film){
+      if (slides[i] === film.parentElement){
+        if (film.preload === 'none'){ film.preload = 'auto'; film.load(); }
+        play(film);
+      } else film.pause();
+    }
+  }
+  function next(){ show((at + 1) % slides.length); }
+  function start(){ if (!manual && !RM && !timer) timer = setInterval(next, 4200); }
+  function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+
+  bd.addEventListener('mouseenter', stop);
+  bd.addEventListener('mouseleave', function(){ start(); });
+  dots.forEach(function(d){
+    d.addEventListener('click', function(){ manual = true; stop(); show(+d.dataset.go); });
+  });
+  slides.forEach(function(s){
+    s.addEventListener('click', function(){ manual = true; stop(); show(+s.dataset.i); });
+  });
+
+  show(0);
+  start();
+  return {stop:stop};
+}
+
 /* ---- the study overlay ---- */
 const study = document.getElementById('study');
+let boardLive = null;
 function openStudy(c){
   const wrap = document.getElementById('studyScroll');
   let h = '<div class="study-in">';
   h += '<div class="study-eyebrow">'+c.client+' &middot; '+c.cat+'</div>';
   h += '<h2 class="study-h">'+((c.study && c.study.heading) || c.title)+'</h2>';
   h += '<video class="study-film" controls playsinline preload="metadata" poster="'+c.cover+'" src="'+c.film+'"></video>';
+  if (c.board) h += boardHTML(c);
   if (c.study){
     (c.study.body||[]).forEach(function(sec){
       h += '<div class="study-sec"><h3>'+sec[0]+'</h3>';
@@ -1536,12 +1721,15 @@ function openStudy(c){
   h += '</div>';
   wrap.innerHTML = h;
   wrap.scrollTop = 0;
+  if (boardLive){ boardLive.stop(); boardLive = null; }
+  boardLive = boardInit(wrap);
   study.classList.add('open');
   document.body.classList.add('no-scroll');
   (window.__caseCards||[]).forEach(function(r){ r.v.pause(); });
   document.getElementById('studyX').focus();
 }
 function closeStudy(){
+  if (boardLive){ boardLive.stop(); boardLive = null; }
   study.classList.remove('open');
   document.body.classList.remove('no-scroll');
   const v = document.getElementById('studyScroll').querySelector('video');
