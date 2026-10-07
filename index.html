@@ -1699,8 +1699,14 @@ function boardInit(root){
      it stays put, and it picks up again once the cursor leaves. */
   function goTo(i){ show(i); stop(); start(); }
 
-  bd.addEventListener('mouseenter', function(){ hovering = true;  stop();  });
-  bd.addEventListener('mouseleave', function(){ hovering = false; start(); });
+  /* Hover holds the carousel, but only over the frames and the controls.
+     It used to be the whole block, so resting the cursor anywhere over the
+     scene description froze the rotation until the mouse moved away. */
+  [bd.querySelector('.bd-stage'), bd.querySelector('.bd-rail')].forEach(function(zone){
+    if (!zone) return;
+    zone.addEventListener('mouseenter', function(){ hovering = true;  stop();  });
+    zone.addEventListener('mouseleave', function(){ hovering = false; start(); });
+  });
 
   arrows.forEach(function(a){
     a.addEventListener('click', function(e){ e.stopPropagation(); goTo((at + (+a.dataset.dir) + slides.length) % slides.length); });
