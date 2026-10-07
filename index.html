@@ -617,6 +617,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 }
 .bd-cue{font-family:var(--sans);font-style:italic;font-size:13.5px;color:var(--bone-dim)}
 .bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:none}
+.bd-cut{position:relative;padding-left:20px;margin-bottom:.55em}
+.bd-cut::before{content:'';position:absolute;left:0;top:.62em;width:8px;height:1px;background:var(--violet-2)}
 .bd-line{
   display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;
   border-left:2px solid var(--violet);padding:7px 0 7px 14px;margin-top:8px;
@@ -1057,7 +1059,48 @@ const CASES = [
   { id:'augusta-lawncare', client:'Augusta Lawncare', cat:'Local TV',
     title:'A mixed-world composite, built from the streets of West Chester.',
     film:'/media/stage/augusta-christmas-v7.mp4',
-    cover:'/media/case/augusta-lawncare.jpg' }
+    cover:'/media/case/augusta-lawncare.jpg',
+    board:{
+      intro:'Every frame below came from the deck we pitched before a single shot existed. Set them against the commercial above and watch how little changed.',
+      frames:[
+        { img:'/media/board/aug-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:04',
+          cue:'Jingle begins playing',
+          desc:[
+            'A beautiful West Chester suburban front lawn. Looks completely normal, until Max walks in from the right, full body, cartoon lawnmower in hand. He stops, turns to camera, and opens his mouth in sync with the jingle with total confidence. Lyrics appear on screen in Montserrat. The jingle kicks in immediately after.',
+            'This is the moment the viewer is hooked.'
+          ],
+          lines:[['Jingle','Landscaping and lawn care needs'],
+                 ['Jingle','In West Chester']] },
+
+        { img:'/media/board/aug-2.jpg', scene:'Scene 2', name:'The Work', time:'0:04 to 0:18',
+          cue:'Jingle plays underneath at medium volume',
+          desc:[
+            'Three quick cuts. Max doing what Augusta does best. No humans, no narration. Just Max and his tools, with confidence and personality, rocking to the jingle.',
+            '• Cut 1. Aerial mowing. Top down view, Max tiny against a perfectly striped lawn. Cinematic, and it communicates precision instantly.',
+            '• Cut 2. Hedge trimming. Max mid snip on a real suburban shrub, cartoon leaves flying off in every direction.',
+            '• Cut 3. Leaf blowing. Max plants his feet on a real driveway and lets it rip. Real leaves scatter dramatically.'
+          ],
+          lines:[] },
+
+        { img:'/media/board/aug-3.jpg', scene:'Scene 3', name:'The Crew', time:'0:18 to 0:27',
+          cue:'Jingle continues underneath',
+          desc:[
+            'The branded Augusta truck is parked at the curb. A crew member, Johnny, walks away from the truck toward the house, tool in hand. Max walks right beside him at waist height, head tilted up in conversation.',
+            'Both lines are captioned on screen. This is the moment that humanizes the brand, Max and the crew member as a team. Warm, funny, and it makes Augusta feel like people you’d actually want at your house.'
+          ],
+          lines:[['Max','“There isn’t ‘mulch’ we wouldn’t do right, Johnny.”'],
+                 ['Johnny','[laughs and nods] “Yeah, that’s right, Max.”']] },
+
+        { img:'/media/board/aug-4.jpg', scene:'Scene 4', name:'The Close', time:'0:27 to 0:30',
+          cue:'Jingle ramps to full volume',
+          desc:[
+            'Max leans against the branded Augusta truck. He looks directly at the camera, completely at ease, delivers the line, and winks.',
+            'The Augusta logo locks on screen. The phone number appears. The jingle hits full volume and carries it home.'
+          ],
+          lines:[['Max','“Your lawn deserves the best. Good thing you found us.”'],
+                 ['Alt Max','“Call us. Your neighbors already did.”']] }
+      ]
+    } }
 ];
 
 // CINEMA STAGE chapters (the flagships)
@@ -1652,7 +1695,12 @@ function boardHTML(c){
   f.forEach(function(fr,i){
     h += '<div class="bd-note" data-i="'+i+'">' +
            '<div class="bd-meta"><span class="bd-time">'+fr.time+'</span><span class="bd-cue">'+fr.cue+'</span></div>' +
-           '<p>'+fr.desc+'</p>' +
+           (Array.isArray(fr.desc) ? fr.desc : [fr.desc]).map(function(para){
+             // a line opening with a bullet is a shot in a list, not prose
+             return para.charAt(0) === '\u2022'
+               ? '<p class="bd-cut">'+para.slice(1).trim()+'</p>'
+               : '<p>'+para+'</p>';
+           }).join('') +
            fr.lines.map(function(l){
              return '<div class="bd-line"><span class="who">'+l[0]+'</span><span class="say">'+l[1]+'</span></div>';
            }).join('') +
