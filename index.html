@@ -544,6 +544,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 /* ============================================================
    STORYBOARD CAROUSEL
    ============================================================ */
+.bd .study-sec{max-width:90ch;margin-inline:auto}
 .bd{
   margin-top:clamp(36px,5vw,64px);
   /* the board steps outside the 980px reading column and runs close to the
@@ -601,7 +602,9 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 .bd-arrow:hover{background:var(--bone);color:var(--ink);border-color:var(--bone)}
 .bd-arrow:focus-visible{outline:2px solid var(--violet-2);outline-offset:3px}
 
-.bd-detail{display:grid;margin-top:clamp(20px,2.6vw,30px)}
+/* the frames and the rail are centred, so the writing under them is too:
+   one column, equal space left and right, rather than hugging the left edge */
+.bd-detail{display:grid;margin-top:clamp(20px,2.6vw,30px);max-width:90ch;margin-inline:auto;width:100%}
 .bd-note{
   grid-area:1/1;opacity:0;pointer-events:none;
   transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease);
@@ -613,7 +616,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   color:#fff;background:var(--violet);padding:6px 12px;
 }
 .bd-cue{font-family:var(--sans);font-style:italic;font-size:13.5px;color:var(--bone-dim)}
-.bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:90ch}
+.bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:none}
 .bd-line{
   display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;
   border-left:2px solid var(--violet);padding:7px 0 7px 14px;margin-top:8px;
@@ -1008,7 +1011,7 @@ const CASES = [
     cover:'media/case/tpg-creations.jpg',
     board:{
       finalPoster:'media/board/tpg-final.jpg',
-      intro:'Every frame below came from the deck we pitched before a single shot existed. The finished commercial is the last slide in the sequence. Watch how little changed.',
+      intro:'Every frame below came from the deck we pitched before a single shot existed. Set them against the commercial above and watch how little changed.',
       frames:[
         { img:'media/board/tpg-1.jpg', scene:'Scene 1', name:'The Hook', time:'0:00 to 0:05',
           cue:'Piano keys fade in',
@@ -1631,10 +1634,6 @@ function boardHTML(c){
            '<figcaption class="bd-tag">'+fr.scene+' &middot; '+fr.name+'</figcaption>' +
          '</figure>';
   });
-  h += '<figure class="bd-slide bd-final" data-i="'+f.length+'">' +
-         '<video muted loop playsinline preload="none" poster="'+(c.board.finalPoster||c.cover)+'" src="'+c.film+'"></video>' +
-         '<figcaption class="bd-tag">The finished commercial</figcaption>' +
-       '</figure>';
   h += '</div>';
 
   const CHEV = function(d){
@@ -1644,7 +1643,7 @@ function boardHTML(c){
   h += '<div class="bd-rail">';
   h += '<button class="bd-arrow" data-dir="-1" aria-label="Previous frame">'+CHEV(-1)+'</button>';
   h += '<div class="bd-dots">';
-  for (let i=0;i<=f.length;i++) h += '<button class="bd-dot" data-go="'+i+'" aria-label="Frame '+(i+1)+'"><i></i></button>';
+  for (let i=0;i<f.length;i++) h += '<button class="bd-dot" data-go="'+i+'" aria-label="Frame '+(i+1)+'"><i></i></button>';
   h += '</div>';
   h += '<button class="bd-arrow" data-dir="1" aria-label="Next frame">'+CHEV(1)+'</button>';
   h += '</div>';
@@ -1659,10 +1658,6 @@ function boardHTML(c){
            }).join('') +
          '</div>';
   });
-  h += '<div class="bd-note" data-i="'+f.length+'">' +
-         '<div class="bd-meta"><span class="bd-time">The result</span><span class="bd-cue">What shipped</span></div>' +
-         '<p>Same beats, same staging, same joke. The pitch was not a mood board, it was the plan.</p>' +
-       '</div>';
   h += '</div></div>';
   return h;
 }
