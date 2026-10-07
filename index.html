@@ -544,16 +544,10 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 /* ============================================================
    STORYBOARD CAROUSEL
    ============================================================ */
-.bd{
-  margin-top:clamp(36px,5vw,64px);
-  /* steps outside the 980px reading column: the frames and their notes want
-     far more room than body copy does */
-  width:min(1440px,92vw);margin-left:50%;transform:translateX(-50%);
-}
-.bd .study-sec p{max-width:none}
+.bd{margin-top:clamp(36px,5vw,64px)}
 .bd-stage{
   position:relative;margin-top:clamp(22px,3vw,34px);
-  height:clamp(230px,32vw,520px);
+  height:clamp(230px,30vw,430px);
   display:flex;align-items:center;justify-content:center;
   perspective:1400px;
   /* the flanking frames are meant to run off the edges; clip them here so they
@@ -561,7 +555,7 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   overflow:hidden;
 }
 .bd-slide{
-  position:absolute;top:50%;left:50%;margin:0;width:min(56%,820px);
+  position:absolute;top:50%;left:50%;margin:0;width:min(62%,620px);
   transform:translate(-50%,-50%) scale(.74);
   opacity:0;pointer-events:none;cursor:pointer;
   transition:transform .75s var(--ease),opacity .6s var(--ease),filter .6s var(--ease);
@@ -613,8 +607,8 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
   font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
   color:#fff;background:var(--violet);padding:6px 12px;
 }
-.bd-cue{font-family:var(--sans);font-style:italic;font-size:14px;color:var(--bone-dim)}
-.bd-note p{margin:0 0 18px;font-size:clamp(15px,1.15vw,17px);line-height:1.7;color:var(--bone-dim);max-width:112ch}
+.bd-cue{font-family:var(--sans);font-style:italic;font-size:13.5px;color:var(--bone-dim)}
+.bd-note p{margin:0 0 14px;font-size:clamp(14px,1.1vw,16px);line-height:1.66;color:var(--bone-dim);max-width:64ch}
 .bd-line{
   display:flex;gap:12px;flex-wrap:wrap;align-items:baseline;
   border-left:2px solid var(--violet);padding:7px 0 7px 14px;margin-top:8px;
