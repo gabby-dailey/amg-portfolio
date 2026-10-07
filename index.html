@@ -587,11 +587,20 @@ footer{padding:clamp(30px,4vw,48px) var(--gut);border-top:1px solid var(--hair-2
 }
 .bd-slide.is-on .bd-tag{opacity:1}
 
-.bd-rail{display:flex;justify-content:center;gap:10px;margin-top:clamp(16px,2vw,24px)}
+/* arrows sit on the same line as the markers, never over the artwork */
+.bd-rail{display:flex;align-items:center;justify-content:center;gap:clamp(14px,2.2vw,28px);margin-top:clamp(16px,2vw,24px)}
+.bd-dots{display:flex;align-items:center;gap:10px}
 .bd-dot{padding:8px 4px;background:none;border:0;cursor:pointer;line-height:0}
 .bd-dot i{display:block;width:34px;height:2px;background:var(--hair);transition:background .4s var(--ease)}
 .bd-dot:hover i{background:var(--bone-faint)}
 .bd-dot.is-on i{background:var(--violet-2)}
+.bd-arrow{
+  width:40px;height:40px;flex:0 0 auto;border:1px solid var(--hair);border-radius:50%;
+  background:none;color:var(--bone-dim);display:grid;place-items:center;cursor:pointer;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease);
+}
+.bd-arrow:hover{background:var(--bone);color:var(--ink);border-color:var(--bone)}
+.bd-arrow:focus-visible{outline:2px solid var(--violet-2);outline-offset:3px}
 
 .bd-detail{display:grid;margin-top:clamp(20px,2.6vw,30px)}
 .bd-note{
@@ -1629,8 +1638,16 @@ function boardHTML(c){
        '</figure>';
   h += '</div>';
 
+  const CHEV = function(d){
+    return '<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">' +
+           '<path d="'+(d<0?'M8 1L2 8l6 7':'M2 1l6 7-6 7')+'" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  };
   h += '<div class="bd-rail">';
+  h += '<button class="bd-arrow" data-dir="-1" aria-label="Previous frame">'+CHEV(-1)+'</button>';
+  h += '<div class="bd-dots">';
   for (let i=0;i<=f.length;i++) h += '<button class="bd-dot" data-go="'+i+'" aria-label="Frame '+(i+1)+'"><i></i></button>';
+  h += '</div>';
+  h += '<button class="bd-arrow" data-dir="1" aria-label="Next frame">'+CHEV(1)+'</button>';
   h += '</div>';
 
   h += '<div class="bd-detail">';
@@ -1657,8 +1674,9 @@ function boardInit(root){
   const slides = [].slice.call(bd.querySelectorAll('.bd-slide'));
   const notes  = [].slice.call(bd.querySelectorAll('.bd-note'));
   const dots   = [].slice.call(bd.querySelectorAll('.bd-dot'));
+  const arrows = [].slice.call(bd.querySelectorAll('.bd-arrow'));
   const film   = bd.querySelector('.bd-final video');
-  let at = -1, timer = null, manual = false;
+  let at = -1, timer = null, hovering = false;
 
   function show(i){
     if (i === at) return;
@@ -1679,22 +1697,32 @@ function boardInit(root){
       } else film.pause();
     }
   }
-  function next(){ show((at + 1) % slides.length); }
-  function start(){ if (!manual && !RM && !timer) timer = setInterval(next, 4200); }
+  function step(n){ show((at + n + slides.length) % slides.length); }
+  function start(){ if (!RM && !hovering && !timer) timer = setInterval(function(){ step(1); }, 4200); }
   function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+  /* Steering it does not switch the rotation off for good, it just hands the
+     chosen frame a full turn of its own. While the cursor is on the carousel
+     it stays put, and it picks up again once the cursor leaves. */
+  function goTo(i){ show(i); stop(); start(); }
 
-  bd.addEventListener('mouseenter', stop);
-  bd.addEventListener('mouseleave', function(){ start(); });
+  bd.addEventListener('mouseenter', function(){ hovering = true;  stop();  });
+  bd.addEventListener('mouseleave', function(){ hovering = false; start(); });
+
+  arrows.forEach(function(a){
+    a.addEventListener('click', function(e){ e.stopPropagation(); goTo((at + (+a.dataset.dir) + slides.length) % slides.length); });
+  });
   dots.forEach(function(d){
-    d.addEventListener('click', function(){ manual = true; stop(); show(+d.dataset.go); });
+    d.addEventListener('click', function(e){ e.stopPropagation(); goTo(+d.dataset.go); });
   });
   slides.forEach(function(s){
-    s.addEventListener('click', function(){ manual = true; stop(); show(+s.dataset.i); });
+    s.addEventListener('click', function(){ goTo(+s.dataset.i); });
   });
+
+  bd._step = function(n){ goTo((at + n + slides.length) % slides.length); };
 
   show(0);
   start();
-  return {stop:stop};
+  return {stop:stop, step:bd._step};
 }
 
 /* ---- the study overlay ---- */
@@ -1748,7 +1776,11 @@ function closeStudy(){
 }
 document.getElementById('studyX').addEventListener('click', closeStudy);
 document.addEventListener('keydown', function(e){
-  if (e.key === 'Escape' && study.classList.contains('open')) closeStudy();
+  if (!study.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeStudy(); return; }
+  if (!boardLive || !boardLive.step) return;
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); boardLive.step(-1); }
+  if (e.key === 'ArrowRight') { e.preventDefault(); boardLive.step(1);  }
 });
 
 /* ============================================================
