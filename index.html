@@ -1702,7 +1702,8 @@ function boardInit(root){
   /* Hover holds the carousel, but only over the frames and the controls.
      It used to be the whole block, so resting the cursor anywhere over the
      scene description froze the rotation until the mouse moved away. */
-  [bd.querySelector('.bd-stage'), bd.querySelector('.bd-rail')].forEach(function(zone){
+  const stageEl = bd.querySelector('.bd-stage');
+  [stageEl, bd.querySelector('.bd-rail')].forEach(function(zone){
     if (!zone) return;
     zone.addEventListener('mouseenter', function(){ hovering = true;  stop();  });
     zone.addEventListener('mouseleave', function(){ hovering = false; start(); });
@@ -1721,8 +1722,48 @@ function boardInit(root){
   bd._step = function(n){ goTo((at + n + slides.length) % slides.length); };
 
   show(0);
-  start();
-  return {stop:stop, step:bd._step};
+
+  /* Hold on Scene 1 until the frames are actually on screen, so nobody
+     arrives mid sequence after scrolling down past the headline and film.
+     The study scrolls in its own container, so that is what we listen to. */
+  const scroller = bd.closest('.study-scroll');
+  let armed = false, probe = null;
+  function arm(){
+    if (armed) return;
+    // measure against the overlay's own scroll area, not the window: the study
+    // scrolls inside it, and the window is not what the frames move through
+    const vp = scroller ? scroller.getBoundingClientRect()
+             : {top:0, bottom: window.innerHeight || document.documentElement.clientHeight || 0};
+    const vh = vp.bottom - vp.top;
+    if (vh <= 0){                                    // unmeasurable, never stay frozen
+      armed = true;
+      if (probe){ clearInterval(probe); probe = null; }
+      start(); return;
+    }
+    const r = stageEl.getBoundingClientRect();
+    const seen = Math.max(0, Math.min(r.bottom, vp.bottom) - Math.max(r.top, vp.top));
+    if (r.height > 0 && seen / r.height > 0.5){
+      armed = true;
+      if (probe){ clearInterval(probe); probe = null; }
+      start();
+    }
+  }
+  if (scroller) scroller.addEventListener('scroll', arm, {passive:true});
+  window.addEventListener('resize', arm);
+  // a scroll listener alone is one point of failure, so poll gently until it
+  // arms; this clears itself the moment the frames are on screen
+  probe = setInterval(arm, 400);
+  arm();                       // already in view on a short page or deep link
+
+  /* listeners live on the scroller, which outlives this board, so they have
+     to come off when the study closes or they stack up per open */
+  function teardown(){
+    stop();
+    if (probe){ clearInterval(probe); probe = null; }
+    if (scroller) scroller.removeEventListener('scroll', arm);
+    window.removeEventListener('resize', arm);
+  }
+  return {stop:teardown, step:bd._step};
 }
 
 /* ---- the study overlay ---- */
@@ -1760,9 +1801,11 @@ function openStudy(c, fromURL){
   wrap.innerHTML = h;
   wrap.scrollTop = 0;
   if (boardLive){ boardLive.stop(); boardLive = null; }
-  boardLive = boardInit(wrap);
   study.classList.add('open');
   document.body.classList.add('no-scroll');
+  // after the overlay is laid out, or every rect measures zero and the
+  // carousel's in-view check cannot tell where anything is
+  boardLive = boardInit(wrap);
   if (!fromURL) setPath('/work/' + c.id);
   (window.__caseCards||[]).forEach(function(r){ r.v.pause(); });
   document.getElementById('studyX').focus();
